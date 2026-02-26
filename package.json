@@ -16,5 +16,8 @@
     "url": "https://github.com/ItzJessie/demo-backend/issues"
   },
   "homepage": "https://github.com/ItzJessie/demo-backend#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
 }
