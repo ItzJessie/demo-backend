@@ -27,6 +27,18 @@ cd /Users/jessiejavanbrown/Desktop/DEMO-BACKEND2/demo-backend
 npm install
 ```
 
+3. **(Optional) Connect to MongoDB Atlas**
+
+Create a `.env` file in the project root and add:
+
+```env
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/?retryWrites=true&w=majority
+MONGODB_DB=anime_archive
+MONGODB_COLLECTION=feedbacks
+```
+
+If `MONGODB_URI` is present, feedback is written to Atlas and appears in MongoDB Data Explorer.
+
 ## 🎯 Getting Started
 
 ### Start the Server
@@ -170,7 +182,7 @@ Each anime object contains:
 
 ## 💾 Feedback Storage
 
-All feedback submissions are stored in the `/feedbacks` directory as individual JSON files with the naming pattern:
+Feedback is always saved in the local `/feedbacks` directory as individual JSON files with the naming pattern:
 ```
 feedback_[timestamp].json
 ```
@@ -189,6 +201,8 @@ Example feedback file:
   "submittedAt": "2026-03-31T10:36:13.042Z"
 }
 ```
+
+When `MONGODB_URI` is configured, the same feedback is also inserted into Atlas database `MONGODB_DB` and collection `MONGODB_COLLECTION`.
 
 ## 🎨 Design Features
 
