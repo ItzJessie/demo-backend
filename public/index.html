@@ -3,234 +3,277 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>🎌 Anime Archive - Backend API</title>
+        <title>Anime Archive API Portal</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;700&family=Shippori+Mincho:wght@500;700&display=swap"
+            rel="stylesheet"
+        />
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-        <header class="anime-header">
-            <div class="header-content">
-                <h1>🎌 Anime Archive Backend</h1>
-                <p class="subtitle">
-                    Explore our extensive collection of anime series
+        <div class="site-bg" aria-hidden="true"></div>
+        <div class="theme-dock">
+            <button
+                id="themeToggleBtn"
+                type="button"
+                class="action-btn ghost theme-toggle"
+                aria-label="Toggle color theme"
+                aria-pressed="false"
+            >
+                <span class="theme-toggle-track" aria-hidden="true">
+                    <span class="theme-toggle-knob"></span>
+                </span>
+                <span class="theme-toggle-label">Dark mode</span>
+            </button>
+        </div>
+
+        <header class="hero">
+            <div class="hero-overlay" aria-hidden="true"></div>
+            <div class="hero-content">
+                <p class="hero-kicker">Anime Archive</p>
+                <h1>Backend API Portal</h1>
+                <p class="hero-copy">
+                    A public gateway for anime data and feedback endpoints. Use
+                    the links below to inspect live API responses.
                 </p>
             </div>
         </header>
 
-        <main class="container">
-            <!-- Navigation -->
-            <nav class="nav-section">
-                <button class="nav-btn active" data-section="anime">
-                    📺 Anime Series
-                </button>
-                <button class="nav-btn" data-section="feedback">
-                    💬 Feedback Form
-                </button>
-                <button class="nav-btn" data-section="api-docs">
-                    📚 API Documentation
-                </button>
-            </nav>
-
-            <!-- Anime Series Section -->
-            <section id="anime" class="section active">
-                <h2>Popular Anime Series</h2>
-                <div class="controls">
+        <main class="page-shell">
+            <section class="panel reveal" aria-labelledby="search-heading">
+                <div class="panel-header">
+                    <h2 id="search-heading">Live Anime Search</h2>
+                    <span class="panel-tag">Calls GET /api/anime</span>
+                </div>
+                <form id="animeSearchForm" class="search-row">
                     <input
-                        type="text"
-                        id="searchInput"
-                        placeholder="Search anime by title..."
-                        class="search-box"
+                        id="animeSearchInput"
+                        type="search"
+                        placeholder="Search by title, genre, studio..."
+                        aria-label="Search anime"
                     />
-                    <select id="eraFilter" class="filter">
-                        <option value="">All Eras</option>
-                        <option value="1980s">1980s</option>
-                        <option value="1990s">1990s</option>
-                        <option value="2000s">2000s</option>
-                        <option value="2010s">2010s</option>
-                        <option value="2020s">2020s</option>
-                    </select>
-                </div>
-                <div id="animeList" class="anime-grid">
-                    <!-- Anime cards will be dynamically loaded here -->
-                </div>
-            </section>
-
-            <!-- Feedback Form Section -->
-            <section id="feedback" class="section">
-                <h2>Share Your Feedback</h2>
-                <form id="feedbackForm" class="feedback-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="name">Name *</label>
-                            <input
-                                type="text"
-                                id="name"
-                                name="name"
-                                required
-                                placeholder="Your name"
-                            />
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email *</label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                required
-                                placeholder="your@email.com"
-                            />
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="phone">Phone</label>
-                            <input
-                                type="tel"
-                                id="phone"
-                                name="phone"
-                                placeholder="(555) 123-4567"
-                            />
-                        </div>
-                        <div class="form-group">
-                            <label for="age">Age</label>
-                            <input
-                                type="number"
-                                id="age"
-                                name="age"
-                                placeholder="Your age"
-                            />
-                        </div>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="satisfaction"
-                            >How satisfied were you with the Anime Archive?
-                            *</label
-                        >
-                        <textarea
-                            id="satisfaction"
-                            name="satisfaction"
-                            required
-                            rows="4"
-                            placeholder="Tell us what you think..."
-                        ></textarea>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label>Rate this website (1-5 stars) *</label>
-                        <div class="rating-stars">
-                            <input
-                                type="radio"
-                                id="star5"
-                                name="rating"
-                                value="5"
-                                required
-                            />
-                            <label for="star5" class="star">⭐</label>
-                            <input
-                                type="radio"
-                                id="star4"
-                                name="rating"
-                                value="4"
-                            />
-                            <label for="star4" class="star">⭐</label>
-                            <input
-                                type="radio"
-                                id="star3"
-                                name="rating"
-                                value="3"
-                            />
-                            <label for="star3" class="star">⭐</label>
-                            <input
-                                type="radio"
-                                id="star2"
-                                name="rating"
-                                value="2"
-                            />
-                            <label for="star2" class="star">⭐</label>
-                            <input
-                                type="radio"
-                                id="star1"
-                                name="rating"
-                                value="1"
-                            />
-                            <label for="star1" class="star">⭐</label>
-                        </div>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="comments">Additional Comments</label>
-                        <textarea
-                            id="comments"
-                            name="comments"
-                            rows="3"
-                            placeholder="Any suggestions or feedback..."
-                        ></textarea>
-                    </div>
-
-                    <button type="submit" class="submit-btn">
-                        Submit Feedback 🚀
+                    <button type="submit" class="action-btn primary">
+                        Search API
                     </button>
-                    <div id="feedbackMessage" class="message"></div>
+                    <button
+                        id="clearSearchBtn"
+                        type="button"
+                        class="action-btn ghost"
+                    >
+                        Clear
+                    </button>
                 </form>
+                <p id="searchMeta" class="state-note compact">
+                    Start typing and run a live search.
+                </p>
             </section>
 
-            <!-- API Documentation Section -->
-            <section id="api-docs" class="section">
-                <h2>API Documentation</h2>
-                <div class="api-docs">
-                    <div class="endpoint">
-                        <h3>📺 Get All Anime Series</h3>
-                        <p>
-                            <strong>Endpoint:</strong>
-                            <code>GET /api/anime</code>
-                        </p>
-                        <p>Returns all anime series in the database.</p>
-                    </div>
-                    <div class="endpoint">
-                        <h3>🔍 Get Anime by ID</h3>
-                        <p>
-                            <strong>Endpoint:</strong>
-                            <code>GET /api/anime/:id</code>
-                        </p>
-                        <p>Returns a specific anime series by ID (1-10).</p>
-                    </div>
-                    <div class="endpoint">
-                        <h3>💬 Submit Feedback</h3>
-                        <p>
-                            <strong>Endpoint:</strong>
-                            <code>POST /api/feedback</code>
-                        </p>
-                        <p><strong>Body:</strong></p>
-                        <pre>
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "phone": "(555) 123-4567",
-  "age": "25",
-  "satisfaction": "Great content!",
-  "rating": 5,
-  "comments": "Optional additional feedback"
-}</pre
-                        >
-                    </div>
-                    <div class="endpoint">
-                        <h3>📋 Get All Feedback</h3>
-                        <p>
-                            <strong>Endpoint:</strong>
-                            <code>GET /api/feedback</code>
-                        </p>
-                        <p>Returns all submitted feedback.</p>
-                    </div>
+            <section
+                class="panel reveal delay"
+                aria-labelledby="filter-heading"
+            >
+                <div class="panel-header">
+                    <h2 id="filter-heading">Smart Filter Builder</h2>
+                    <span class="panel-tag">Era, Studio, Genre, Episodes</span>
                 </div>
+                <form id="filterForm" class="filter-grid">
+                    <label class="field-wrap">
+                        Era
+                        <select id="eraFilter">
+                            <option value="">All eras</option>
+                        </select>
+                    </label>
+                    <label class="field-wrap">
+                        Studio
+                        <select id="studioFilter">
+                            <option value="">All studios</option>
+                        </select>
+                    </label>
+                    <label class="field-wrap">
+                        Genre contains
+                        <input
+                            id="genreFilter"
+                            type="text"
+                            placeholder="Action, Sci-Fi..."
+                        />
+                    </label>
+                    <label class="field-wrap">
+                        Minimum episodes
+                        <input
+                            id="minEpisodesFilter"
+                            type="number"
+                            min="0"
+                            step="1"
+                            placeholder="0"
+                        />
+                    </label>
+                    <label class="field-wrap">
+                        Sort by
+                        <select id="sortFilter">
+                            <option value="year-asc">Year ascending</option>
+                            <option value="year-desc">Year descending</option>
+                            <option value="episodes-desc">
+                                Episodes high to low
+                            </option>
+                            <option value="title-asc">Title A-Z</option>
+                        </select>
+                    </label>
+                    <div class="filter-actions">
+                        <button type="submit" class="action-btn primary">
+                            Apply Filters
+                        </button>
+                        <button
+                            id="resetFiltersBtn"
+                            type="button"
+                            class="action-btn ghost"
+                        >
+                            Reset
+                        </button>
+                    </div>
+                </form>
+                <p id="filterMeta" class="state-note compact">
+                    Filters not applied yet.
+                </p>
+            </section>
+
+            <section class="panel reveal" aria-labelledby="api-heading">
+                <div class="panel-header">
+                    <h2 id="api-heading">Available API Requests</h2>
+                    <a
+                        class="json-link"
+                        href="/api/routes"
+                        target="_blank"
+                        rel="noreferrer"
+                        >Open /api/routes</a
+                    >
+                </div>
+                <div id="routeList" class="endpoint-grid"></div>
+            </section>
+
+            <section class="panel reveal" aria-labelledby="explorer-heading">
+                <div class="panel-header">
+                    <h2 id="explorer-heading">Endpoint Explorer</h2>
+                    <span class="panel-tag"
+                        >Run endpoints without leaving page</span
+                    >
+                </div>
+                <form id="endpointExplorerForm" class="explorer-grid">
+                    <label class="field-wrap span-2">
+                        Endpoint
+                        <select id="endpointSelect"></select>
+                    </label>
+                    <label class="field-wrap">
+                        Anime ID (for /api/anime/:id)
+                        <input
+                            id="endpointAnimeId"
+                            type="number"
+                            min="1"
+                            step="1"
+                            value="1"
+                        />
+                    </label>
+                    <label class="field-wrap span-2">
+                        JSON Body (for POST)
+                        <textarea id="endpointBody" rows="6"></textarea>
+                    </label>
+                    <div class="filter-actions span-2">
+                        <button type="submit" class="action-btn primary">
+                            Run Endpoint
+                        </button>
+                        <button
+                            id="fillSampleBodyBtn"
+                            type="button"
+                            class="action-btn ghost"
+                        >
+                            Fill Sample POST Body
+                        </button>
+                    </div>
+                </form>
+                <div class="integration-row">
+                    <button
+                        type="button"
+                        class="action-btn integration"
+                        data-method="GET"
+                        data-path="/api/anime"
+                    >
+                        Try GET /api/anime
+                    </button>
+                    <button
+                        type="button"
+                        class="action-btn integration"
+                        data-method="GET"
+                        data-path="/api/routes"
+                    >
+                        Try GET /api/routes
+                    </button>
+                    <button
+                        type="button"
+                        class="action-btn integration"
+                        data-method="GET"
+                        data-path="/api/health"
+                    >
+                        Try GET /api/health
+                    </button>
+                    <button
+                        type="button"
+                        class="action-btn integration"
+                        data-method="GET"
+                        data-path="/api/feedback"
+                    >
+                        Try GET /api/feedback
+                    </button>
+                </div>
+            </section>
+
+            <section
+                class="panel reveal delay"
+                aria-labelledby="timeline-heading"
+            >
+                <div class="panel-header">
+                    <h2 id="timeline-heading">
+                        Animated Anime History Timeline
+                    </h2>
+                    <span class="panel-tag">Chronological release journey</span>
+                </div>
+                <div id="timelineTrack" class="timeline-track"></div>
+            </section>
+
+            <section class="panel reveal" aria-labelledby="response-heading">
+                <div class="panel-header">
+                    <h2 id="response-heading">Live API Response</h2>
+                    <p id="responseMeta" class="response-meta">
+                        Run an endpoint to inspect status and JSON.
+                    </p>
+                </div>
+                <pre id="apiResponseViewer" class="response-viewer">
+{
+  "message": "Response output will appear here"
+}</pre
+                >
+            </section>
+
+            <section class="panel reveal delay" aria-labelledby="anime-heading">
+                <div class="panel-header">
+                    <h2 id="anime-heading">
+                        Anime Data Preview (GET /api/anime)
+                    </h2>
+                    <a
+                        class="json-link"
+                        href="/api/anime"
+                        target="_blank"
+                        rel="noreferrer"
+                        >Open /api/anime</a
+                    >
+                </div>
+                <div id="animeList" class="anime-grid"></div>
             </section>
         </main>
 
-        <footer class="anime-footer">
-            <p>🎌 Anime Archive Backend API v1.0 | Powered by Express.js</p>
-            <p>
-                Running on port 3001 | Connect your Anime Archive website here
-            </p>
+        <footer class="site-footer">
+            <p>Anime Archive Backend API</p>
+            <p>Express server on port 3001</p>
         </footer>
 
         <script src="app.js"></script>

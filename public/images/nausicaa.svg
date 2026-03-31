@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Nausicaa of the Valley of the Wind still placeholder">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1a17" />
+      <stop offset="100%" stop-color="#2c7a6d" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#grad)" />
+  <path d="M0 620 L320 420 L640 620 L960 380 L1200 520 L1200 800 L0 800 Z" fill="#f5c542" opacity="0.7" />
+  <text x="90" y="260" fill="#f8f8f8" font-family="Arial, sans-serif" font-size="50" letter-spacing="4">NAUSICAA</text>
+  <text x="90" y="310" fill="#f8f8f8" font-family="Arial, sans-serif" font-size="30" letter-spacing="3">VALLEY OF THE WIND</text>
+</svg>

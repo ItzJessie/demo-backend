@@ -1,0 +1,11 @@
+{
+  "id": "1774983508584",
+  "name": "API Tester",
+  "email": "tester@example.com",
+  "phone": "555-1234",
+  "age": "22",
+  "satisfaction": "Very Satisfied",
+  "rating": "5",
+  "comments": "Testing from Endpoint Explorer",
+  "submittedAt": "2026-03-31T18:58:28.585Z"
+}

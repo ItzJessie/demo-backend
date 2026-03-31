@@ -180,6 +180,24 @@ Each anime object contains:
 }
 ```
 
+## 🧪 Verify Anime Image Mapping
+
+Run this command to validate image usage and mapping quality:
+
+```bash
+npm run verify:images
+```
+
+What it checks:
+
+- Every anime record has an `img_name`
+- Every `img_name` points to an existing file in `public/images`
+- Duplicate image reuse across multiple anime records
+- Unreferenced files in `public/images`
+- Suspicious title-to-filename mismatches (heuristic keyword check)
+
+Tip: if your filenames are numeric or generic, this command helps you catch likely mismatches and review them manually.
+
 ## 💾 Feedback Storage
 
 Feedback is always saved in the local `/feedbacks` directory as individual JSON files with the naming pattern:

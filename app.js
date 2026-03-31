@@ -9,6 +9,7 @@ require("dotenv").config();
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
 const FEEDBACK_DIR = path.join(__dirname, "feedbacks");
+const ANIME_FILE = path.join(__dirname, "data", "animeSeries.json");
 
 const MONGODB_URI = process.env.MONGODB_URI;
 const MONGODB_DB = process.env.MONGODB_DB || "anime_archive";
@@ -16,53 +17,6 @@ const MONGODB_COLLECTION = process.env.MONGODB_COLLECTION || "feedbacks";
 
 let mongoClient;
 let mongoCollection;
-
-const animeList = [
-  {
-    _id: 1,
-    title: "Fullmetal Alchemist",
-    img_name: "images/full-metal-alchemist-500x750.jpg",
-    year: 2003,
-    era: "2000s",
-    genre: "Action, Adventure, Dark Fantasy",
-    synopsis: "Two brothers search for the Philosopher's Stone to restore what they lost.",
-    studio: "Bones",
-    episodes: 51,
-  },
-  {
-    _id: 2,
-    title: "Cowboy Bebop",
-    img_name: "images/cowboy-bebop-500x750.jpg",
-    year: 1998,
-    era: "1990s",
-    genre: "Sci-Fi, Action, Space Western",
-    synopsis: "Bounty hunters chase criminals across the solar system.",
-    studio: "Sunrise",
-    episodes: 26,
-  },
-  {
-    _id: 3,
-    title: "Attack on Titan",
-    img_name: "images/attack-on-titan-500x750.jpg",
-    year: 2013,
-    era: "2010s",
-    genre: "Action, Dark Fantasy",
-    synopsis: "Humanity fights for survival against massive Titans.",
-    studio: "Wit Studio / MAPPA",
-    episodes: 89,
-  },
-  {
-    _id: 4,
-    title: "Frieren: Beyond Journey's End",
-    img_name: "images/frieren-500x750.jpg",
-    year: 2023,
-    era: "2020s",
-    genre: "Fantasy, Drama, Adventure",
-    synopsis: "An elf mage reflects on life after the hero's journey ends.",
-    studio: "Madhouse",
-    episodes: 28,
-  },
-];
 
 async function ensureMongoCollection() {
   if (!MONGODB_URI) {
@@ -105,23 +59,85 @@ async function getLocalFeedback() {
   }
 }
 
+async function loadAnimeList() {
+  const raw = await fs.readFile(ANIME_FILE, "utf8");
+  const parsed = JSON.parse(raw);
+
+  if (!Array.isArray(parsed)) {
+    throw new Error("Anime data file is not an array");
+  }
+
+  return parsed;
+}
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/api/anime", (_req, res) => {
-  res.json(animeList);
+app.get("/api/anime", async (_req, res) => {
+  try {
+    const animeList = await loadAnimeList();
+    res.json(animeList);
+  } catch (err) {
+    console.error("Error loading anime data", err);
+    res.status(500).json({ error: "Failed to load anime records" });
+  }
 });
 
-app.get("/api/anime/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const anime = animeList.find((item) => item._id === id);
+app.get("/api/routes", (_req, res) => {
+  res.json({
+    name: "Anime Archive Backend API",
+    version: "1.0.0",
+    routes: [
+      {
+        method: "GET",
+        path: "/api/anime",
+        description: "Get all anime records",
+      },
+      {
+        method: "GET",
+        path: "/api/anime/:id",
+        description: "Get a single anime by numeric id",
+      },
+      {
+        method: "POST",
+        path: "/api/feedback",
+        description: "Submit feedback",
+      },
+      {
+        method: "GET",
+        path: "/api/feedback",
+        description: "Read all feedback submitted to local storage",
+      },
+      {
+        method: "GET",
+        path: "/api/health",
+        description: "Health and MongoDB configuration status",
+      },
+      {
+        method: "GET",
+        path: "/api/routes",
+        description: "List all available API requests",
+      },
+    ],
+  });
+});
 
-  if (!anime) {
-    return res.status(404).json({ error: "Anime not found" });
+app.get("/api/anime/:id", async (req, res) => {
+  try {
+    const animeList = await loadAnimeList();
+    const id = Number(req.params.id);
+    const anime = animeList.find((item) => item._id === id);
+
+    if (!anime) {
+      return res.status(404).json({ error: "Anime not found" });
+    }
+
+    return res.json(anime);
+  } catch (err) {
+    console.error("Error loading anime data", err);
+    return res.status(500).json({ error: "Failed to load anime records" });
   }
-
-  return res.json(anime);
 });
 
 app.post("/api/feedback", async (req, res) => {
