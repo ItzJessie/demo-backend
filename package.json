@@ -1,17 +1,23 @@
 {
   "name": "demo_backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Anime Archive Backend API - Serves anime data and handles feedback submissions",
+  "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "anime",
+    "api",
+    "backend"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "mongodb": "^7.1.1",
     "multer": "^2.1.1"
   }
 }
