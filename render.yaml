@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: demo-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.0.0
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB
+        value: anime_archive
+      - key: MONGODB_COLLECTION
+        value: feedbacks
