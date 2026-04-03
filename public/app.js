@@ -3,6 +3,7 @@ const THEME_STORAGE_KEY = "animePortalTheme";
 const MOBILE_SECTION_STORAGE_KEY = "animePortalMobileSection";
 const MOBILE_SECTION_QUERY = "(max-width: 640px)";
 const DESKTOP_COLLAPSE_QUERY = "(min-width: 641px)";
+const FALLBACK_IMAGE_PATH = "images/fallback.jpg";
 
 const state = {
     anime: [],
@@ -756,9 +757,11 @@ function createAnimeCard(item) {
 
     const title = String(item.title || "Anime");
     const imagePath = String(item.img_name || "");
+    const resolvedImagePath = imagePath || FALLBACK_IMAGE_PATH;
+    const isMissingImage = !imagePath;
 
     card.innerHTML = `
-        <img src="${escapeHtml(imagePath)}" alt="${escapeHtml(title)}" loading="lazy" />
+        <img src="${escapeHtml(resolvedImagePath)}" alt="${escapeHtml(title)}" loading="lazy" class="${isMissingImage ? "img-missing" : ""}" />
         <div class="anime-card-body">
             <h3 class="anime-title">${escapeHtml(String(item.title || "Untitled"))}</h3>
             <p class="anime-meta">${escapeHtml(String(item.year || "-"))} • ${escapeHtml(String(item.era || "Unknown era"))}</p>
@@ -770,6 +773,12 @@ function createAnimeCard(item) {
     const img = card.querySelector("img");
     if (img) {
         img.addEventListener("error", () => {
+            if (img.dataset.fallbackApplied === "true") {
+                return;
+            }
+
+            img.dataset.fallbackApplied = "true";
+            img.src = FALLBACK_IMAGE_PATH;
             img.classList.add("img-missing");
             img.alt = `${title} (image missing)`;
             console.warn(`Image failed to load for anime #${item._id}: ${title} -> ${imagePath}`);
@@ -784,11 +793,13 @@ function createStudioCard(item) {
     card.className = "knowledge-card";
 
     const imagePath = String(item.image || "");
+    const resolvedImagePath = imagePath || FALLBACK_IMAGE_PATH;
+    const isMissingImage = !imagePath;
     const name = String(item.name || "Unknown studio");
     const related = Array.isArray(item.related) && item.related.length ? item.related.join(", ") : "No linked titles";
 
     card.innerHTML = `
-        <img src="${escapeHtml(imagePath)}" alt="${escapeHtml(name)}" loading="lazy" />
+        <img src="${escapeHtml(resolvedImagePath)}" alt="${escapeHtml(name)}" loading="lazy" class="${isMissingImage ? "img-missing" : ""}" />
         <div class="knowledge-card-body">
             <h3 class="knowledge-title">${escapeHtml(name)}</h3>
             <p class="knowledge-meta">${escapeHtml(String(item.meta || "Studio profile"))}</p>
@@ -796,6 +807,20 @@ function createStudioCard(item) {
             <p class="knowledge-related"><strong>Related:</strong> ${escapeHtml(related)}</p>
         </div>
     `;
+
+    const img = card.querySelector("img");
+    if (img) {
+        img.addEventListener("error", () => {
+            if (img.dataset.fallbackApplied === "true") {
+                return;
+            }
+
+            img.dataset.fallbackApplied = "true";
+            img.src = FALLBACK_IMAGE_PATH;
+            img.classList.add("img-missing");
+            img.alt = `${name} (image missing)`;
+        });
+    }
 
     return card;
 }
@@ -807,9 +832,12 @@ function createCreatorCard(item) {
     const imagePath = String(item.image || "");
     const name = String(item.name || "Unknown creator");
     const related = Array.isArray(item.related) && item.related.length ? item.related.join(", ") : "No linked titles";
+    const portraitMarkup = imagePath
+        ? `<img src="${escapeHtml(imagePath)}" alt="${escapeHtml(name)}" loading="lazy" />`
+        : "";
 
     card.innerHTML = `
-        <img src="${escapeHtml(imagePath)}" alt="${escapeHtml(name)}" loading="lazy" />
+        ${portraitMarkup}
         <div class="knowledge-card-body">
             <h3 class="knowledge-title">${escapeHtml(name)}</h3>
             <p class="knowledge-meta">${escapeHtml(String(item.role || "Creator profile"))}</p>
@@ -818,6 +846,13 @@ function createCreatorCard(item) {
             <p class="knowledge-related"><strong>Related:</strong> ${escapeHtml(related)}</p>
         </div>
     `;
+
+    const img = card.querySelector("img");
+    if (img) {
+        img.addEventListener("error", () => {
+            img.remove();
+        });
+    }
 
     return card;
 }
