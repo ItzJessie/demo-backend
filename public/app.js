@@ -1,10 +1,22 @@
 const API_BASE = "/api";
 const THEME_STORAGE_KEY = "animePortalTheme";
+const MOBILE_SECTION_STORAGE_KEY = "animePortalMobileSection";
+const MOBILE_SECTION_QUERY = "(max-width: 640px)";
+const DESKTOP_COLLAPSE_QUERY = "(min-width: 641px)";
 
 const state = {
     anime: [],
     filteredAnime: [],
+    studios: [],
+    creators: [],
+    filteredStudios: [],
+    filteredCreators: [],
     routes: [],
+    collapsedGridState: {
+        anime: true,
+        studios: true,
+        creators: true,
+    },
 };
 
 const DEFAULT_FEEDBACK_BODY = {
@@ -26,7 +38,11 @@ async function initializePortal() {
     bindEvents();
     fillSampleBody();
 
-    await Promise.all([loadRouteDocs(), refreshAnimeData("Initial load")]);
+    await Promise.all([
+        loadRouteDocs(),
+        refreshAnimeData("Initial load"),
+        refreshStudiosCreatorsData("Initial load"),
+    ]);
 }
 
 function bindEvents() {
@@ -40,6 +56,13 @@ function bindEvents() {
     const integrationButtons = document.querySelectorAll(".integration-row .integration");
     const routeList = document.getElementById("routeList");
     const themeToggleBtn = document.getElementById("themeToggleBtn");
+    const backToTopBtn = document.getElementById("backToTopBtn");
+    const studiosCreatorsSearchForm = document.getElementById("studiosCreatorsSearchForm");
+    const clearStudiosCreatorsSearchBtn = document.getElementById("clearStudiosCreatorsSearchBtn");
+    const mobileToggleButtons = document.querySelectorAll(".mobile-toggle-btn");
+    const animeCollapseBtn = document.getElementById("animeCollapseBtn");
+    const studiosCollapseBtn = document.getElementById("studiosCollapseBtn");
+    const creatorsCollapseBtn = document.getElementById("creatorsCollapseBtn");
 
     animeSearchForm.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -60,6 +83,23 @@ function bindEvents() {
         document.getElementById("filterForm").reset();
         await refreshAnimeData("Filters reset");
     });
+
+    if (studiosCreatorsSearchForm) {
+        studiosCreatorsSearchForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            await refreshStudiosCreatorsData("Studios/creators search applied");
+        });
+    }
+
+    if (clearStudiosCreatorsSearchBtn) {
+        clearStudiosCreatorsSearchBtn.addEventListener("click", async () => {
+            const searchInput = document.getElementById("studiosCreatorsSearchInput");
+            if (searchInput) {
+                searchInput.value = "";
+            }
+            await refreshStudiosCreatorsData("Studios/creators search cleared");
+        });
+    }
 
     endpointForm.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -113,6 +153,37 @@ function bindEvents() {
             localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
         });
     }
+
+    if (backToTopBtn) {
+        const toggleBackToTopVisibility = () => {
+            backToTopBtn.classList.toggle("is-visible", window.scrollY > 280);
+        };
+
+        backToTopBtn.addEventListener("click", () => {
+            const prefersReducedMotion =
+                window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+            window.scrollTo({
+                top: 0,
+                behavior: prefersReducedMotion ? "auto" : "smooth",
+            });
+        });
+
+        window.addEventListener("scroll", toggleBackToTopVisibility, { passive: true });
+        toggleBackToTopVisibility();
+    }
+
+    if (mobileToggleButtons.length) {
+        initializeMobileSectionToggle(mobileToggleButtons);
+    }
+
+    bindGridCollapseToggle(animeCollapseBtn, "anime");
+    bindGridCollapseToggle(studiosCollapseBtn, "studios");
+    bindGridCollapseToggle(creatorsCollapseBtn, "creators");
+
+    window.addEventListener("resize", () => {
+        applyAllGridCollapseStates();
+    });
 }
 
 function initializeTheme() {
@@ -230,6 +301,83 @@ async function refreshAnimeData(reason) {
         console.error(err);
         renderAnimeError();
     }
+}
+
+async function refreshStudiosCreatorsData(reason) {
+    try {
+        const data = await fetchJson(`${API_BASE}/studios-creators`);
+        state.studios = Array.isArray(data.studios) ? data.studios : [];
+        state.creators = Array.isArray(data.creators) ? data.creators : [];
+
+        const query = getStudiosCreatorsQuery();
+        state.filteredStudios = filterStudiosCreators(state.studios, query);
+        state.filteredCreators = filterStudiosCreators(state.creators, query);
+
+        renderStudios(state.filteredStudios);
+        renderCreators(state.filteredCreators);
+        updateStudiosCreatorsMeta(
+            reason,
+            state.filteredStudios.length,
+            state.studios.length,
+            state.filteredCreators.length,
+            state.creators.length
+        );
+    } catch (err) {
+        console.error(err);
+        renderStudiosCreatorsError();
+    }
+}
+
+function initializeMobileSectionToggle(toggleButtons) {
+    const mediaQuery = window.matchMedia(MOBILE_SECTION_QUERY);
+    const animeSection = document.getElementById("animePreviewSection");
+    const studiosSection = document.getElementById("studiosCreatorsPreviewSection");
+
+    if (!animeSection || !studiosSection) {
+        return;
+    }
+
+    const applySectionState = (sectionName, updateStorage = true) => {
+        const showAnime = sectionName !== "studios-creators";
+        animeSection.classList.toggle("is-mobile-hidden", mediaQuery.matches && !showAnime);
+        studiosSection.classList.toggle("is-mobile-hidden", mediaQuery.matches && showAnime);
+
+        toggleButtons.forEach((button) => {
+            const isActive = button.dataset.target === (showAnime ? "animePreviewSection" : "studiosCreatorsPreviewSection");
+            button.classList.toggle("is-active", isActive);
+            button.classList.toggle("primary", isActive);
+            button.classList.toggle("ghost", !isActive);
+            button.setAttribute("aria-pressed", String(isActive));
+        });
+
+        if (updateStorage) {
+            localStorage.setItem(MOBILE_SECTION_STORAGE_KEY, showAnime ? "anime" : "studios-creators");
+        }
+    };
+
+    toggleButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const target = button.dataset.target === "studiosCreatorsPreviewSection" ? "studios-creators" : "anime";
+            applySectionState(target);
+        });
+    });
+
+    const getStoredSection = () =>
+        localStorage.getItem(MOBILE_SECTION_STORAGE_KEY) === "studios-creators"
+            ? "studios-creators"
+            : "anime";
+
+    const syncForViewport = () => {
+        applySectionState(getStoredSection(), false);
+    };
+
+    if (typeof mediaQuery.addEventListener === "function") {
+        mediaQuery.addEventListener("change", syncForViewport);
+    } else if (typeof mediaQuery.addListener === "function") {
+        mediaQuery.addListener(syncForViewport);
+    }
+
+    applySectionState(getStoredSection(), false);
 }
 
 function applySearchAndFilters(anime, options = {}) {
@@ -359,6 +507,7 @@ function renderAnimeList(anime) {
     });
 
     animeList.appendChild(fragment);
+    applyGridCollapseState("anime");
 }
 
 function renderAnimeError() {
@@ -394,6 +543,186 @@ function renderTimeline(anime) {
     });
 
     timelineTrack.appendChild(fragment);
+}
+
+function getStudiosCreatorsQuery() {
+    const searchInput = document.getElementById("studiosCreatorsSearchInput");
+    return searchInput ? searchInput.value.trim() : "";
+}
+
+function filterStudiosCreators(items, query) {
+    const normalizedQuery = normalizeSearchText(query);
+    const queryTokens = toSearchTokens(query);
+
+    return items.filter((item) => {
+        const searchable = normalizeSearchText(
+            `${item.name || ""} ${item.meta || ""} ${item.role || ""} ${item.affiliation || ""} ${item.detail || ""} ${(item.related || []).join(" ")}`
+        );
+
+        if (!normalizedQuery) {
+            return true;
+        }
+
+        return searchable.includes(normalizedQuery) || queryTokens.every((token) => searchable.includes(token));
+    });
+}
+
+function renderStudios(studios) {
+    const studiosList = document.getElementById("studiosList");
+    if (!studiosList) {
+        return;
+    }
+
+    studiosList.innerHTML = "";
+    if (!studios.length) {
+        studiosList.innerHTML = `<p class="state-note">No studio records match your search.</p>`;
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    studios.forEach((studio) => {
+        fragment.appendChild(createStudioCard(studio));
+    });
+
+    studiosList.appendChild(fragment);
+    applyGridCollapseState("studios");
+}
+
+function renderCreators(creators) {
+    const creatorsList = document.getElementById("creatorsList");
+    if (!creatorsList) {
+        return;
+    }
+
+    creatorsList.innerHTML = "";
+    if (!creators.length) {
+        creatorsList.innerHTML = `<p class="state-note">No creator records match your search.</p>`;
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    creators.forEach((creator) => {
+        fragment.appendChild(createCreatorCard(creator));
+    });
+
+    creatorsList.appendChild(fragment);
+    applyGridCollapseState("creators");
+}
+
+function bindGridCollapseToggle(button, key) {
+    if (!button) {
+        return;
+    }
+
+    button.addEventListener("click", () => {
+        state.collapsedGridState[key] = !state.collapsedGridState[key];
+        applyGridCollapseState(key);
+    });
+}
+
+function applyAllGridCollapseStates() {
+    applyGridCollapseState("anime");
+    applyGridCollapseState("studios");
+    applyGridCollapseState("creators");
+}
+
+function applyGridCollapseState(key) {
+    const config = {
+        anime: {
+            gridId: "animeList",
+            buttonId: "animeCollapseBtn",
+            cardClass: "anime-card",
+            showMoreLabel: "Show more anime",
+            showLessLabel: "Show less anime",
+        },
+        studios: {
+            gridId: "studiosList",
+            buttonId: "studiosCollapseBtn",
+            cardClass: "knowledge-card",
+            showMoreLabel: "Show more studios",
+            showLessLabel: "Show fewer studios",
+        },
+        creators: {
+            gridId: "creatorsList",
+            buttonId: "creatorsCollapseBtn",
+            cardClass: "knowledge-card",
+            showMoreLabel: "Show more creators",
+            showLessLabel: "Show fewer creators",
+        },
+    }[key];
+
+    if (!config) {
+        return;
+    }
+
+    const grid = document.getElementById(config.gridId);
+    const button = document.getElementById(config.buttonId);
+    if (!grid || !button) {
+        return;
+    }
+
+    const cards = Array.from(grid.querySelectorAll(`.${config.cardClass}`));
+    cards.forEach((card) => {
+        card.classList.remove("is-collapsed-hidden");
+    });
+
+    const isDesktop = window.matchMedia(DESKTOP_COLLAPSE_QUERY).matches;
+    if (!isDesktop) {
+        button.classList.add("is-hidden");
+        button.setAttribute("aria-expanded", "true");
+        return;
+    }
+
+    const columns = getGridColumnCount(grid);
+    const maxVisibleCards = Math.max(1, columns * 2);
+
+    if (cards.length <= maxVisibleCards) {
+        button.classList.add("is-hidden");
+        button.setAttribute("aria-expanded", "true");
+        return;
+    }
+
+    button.classList.remove("is-hidden");
+
+    const isCollapsed = state.collapsedGridState[key] !== false;
+    if (isCollapsed) {
+        cards.slice(maxVisibleCards).forEach((card) => {
+            card.classList.add("is-collapsed-hidden");
+        });
+    }
+
+    button.textContent = isCollapsed ? config.showMoreLabel : config.showLessLabel;
+    button.setAttribute("aria-expanded", String(!isCollapsed));
+}
+
+function getGridColumnCount(grid) {
+    const style = window.getComputedStyle(grid);
+    if (style.display !== "grid") {
+        return 1;
+    }
+
+    const template = style.gridTemplateColumns;
+    if (!template || template === "none") {
+        return 1;
+    }
+
+    return template.split(" ").filter(Boolean).length || 1;
+}
+
+function renderStudiosCreatorsError() {
+    const studiosList = document.getElementById("studiosList");
+    const creatorsList = document.getElementById("creatorsList");
+    const meta = document.getElementById("studiosCreatorsMeta");
+
+    if (studiosList) {
+        studiosList.innerHTML = `<p class="state-note">Could not load studios from GET /api/studios-creators.</p>`;
+    }
+    if (creatorsList) {
+        creatorsList.innerHTML = `<p class="state-note">Could not load creators from GET /api/studios-creators.</p>`;
+    }
+    if (meta) {
+        meta.textContent = "Studios/creators data unavailable right now.";
+    }
 }
 
 function createRouteCard(route) {
@@ -446,6 +775,49 @@ function createAnimeCard(item) {
             console.warn(`Image failed to load for anime #${item._id}: ${title} -> ${imagePath}`);
         });
     }
+
+    return card;
+}
+
+function createStudioCard(item) {
+    const card = document.createElement("article");
+    card.className = "knowledge-card";
+
+    const imagePath = String(item.image || "");
+    const name = String(item.name || "Unknown studio");
+    const related = Array.isArray(item.related) && item.related.length ? item.related.join(", ") : "No linked titles";
+
+    card.innerHTML = `
+        <img src="${escapeHtml(imagePath)}" alt="${escapeHtml(name)}" loading="lazy" />
+        <div class="knowledge-card-body">
+            <h3 class="knowledge-title">${escapeHtml(name)}</h3>
+            <p class="knowledge-meta">${escapeHtml(String(item.meta || "Studio profile"))}</p>
+            <p class="knowledge-detail">${escapeHtml(String(item.detail || "No details available."))}</p>
+            <p class="knowledge-related"><strong>Related:</strong> ${escapeHtml(related)}</p>
+        </div>
+    `;
+
+    return card;
+}
+
+function createCreatorCard(item) {
+    const card = document.createElement("article");
+    card.className = "knowledge-card";
+
+    const imagePath = String(item.image || "");
+    const name = String(item.name || "Unknown creator");
+    const related = Array.isArray(item.related) && item.related.length ? item.related.join(", ") : "No linked titles";
+
+    card.innerHTML = `
+        <img src="${escapeHtml(imagePath)}" alt="${escapeHtml(name)}" loading="lazy" />
+        <div class="knowledge-card-body">
+            <h3 class="knowledge-title">${escapeHtml(name)}</h3>
+            <p class="knowledge-meta">${escapeHtml(String(item.role || "Creator profile"))}</p>
+            <p class="knowledge-meta">${escapeHtml(String(item.affiliation || ""))}</p>
+            <p class="knowledge-detail">${escapeHtml(String(item.detail || "No details available."))}</p>
+            <p class="knowledge-related"><strong>Related:</strong> ${escapeHtml(related)}</p>
+        </div>
+    `;
 
     return card;
 }
@@ -553,6 +925,15 @@ function updateSearchMeta(reason, filteredCount, totalCount) {
 function updateFilterMeta(filteredCount, totalCount) {
     const filterMeta = document.getElementById("filterMeta");
     filterMeta.textContent = `Filter result: ${filteredCount} / ${totalCount} records.`;
+}
+
+function updateStudiosCreatorsMeta(reason, filteredStudios, totalStudios, filteredCreators, totalCreators) {
+    const meta = document.getElementById("studiosCreatorsMeta");
+    if (!meta) {
+        return;
+    }
+
+    meta.textContent = `${reason}. Studios: ${filteredStudios}/${totalStudios}. Creators: ${filteredCreators}/${totalCreators}.`;
 }
 
 async function fetchJson(url) {

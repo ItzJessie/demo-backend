@@ -185,6 +185,55 @@ body.theme-shift::before {
     z-index: 30;
 }
 
+.back-to-top {
+    position: fixed;
+    right: clamp(0.7rem, 2.5vw, 1.4rem);
+    bottom: max(0.8rem, env(safe-area-inset-bottom));
+    z-index: 25;
+    min-width: 58px;
+    border: 1px solid rgba(109, 68, 35, 0.35);
+    border-radius: 999px;
+    padding: 0.5rem 0.85rem;
+    background: linear-gradient(
+        140deg,
+        color-mix(in srgb, var(--surface-raised) 90%, transparent),
+        color-mix(in srgb, var(--surface-soft) 95%, transparent)
+    );
+    color: var(--accent);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 24px var(--shadow-700);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.back-to-top.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top:hover {
+    box-shadow: 0 13px 26px var(--shadow-900);
+    transform: translateY(-1px);
+}
+
+.back-to-top:active {
+    transform: translateY(0);
+}
+
+.back-to-top:focus-visible {
+    outline: 2px solid rgba(139, 111, 71, 0.45);
+    outline-offset: 2px;
+}
+
 .hero {
     min-height: 46vh;
     position: relative;
@@ -477,6 +526,94 @@ body[data-theme="dark"] .theme-toggle-label {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
     gap: 1rem;
+}
+
+.dual-grid-shell {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 0.95rem;
+}
+
+.subheading {
+    font-family: "Shippori Mincho", serif;
+    color: var(--brown-900);
+    margin-bottom: 0.6rem;
+}
+
+.knowledge-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+}
+
+.knowledge-card {
+    border: 1px solid rgba(109, 68, 35, 0.24);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--surface-card);
+    box-shadow: 0 8px 18px var(--shadow-700);
+    display: grid;
+    grid-template-columns: 112px 1fr;
+    min-width: 0;
+}
+
+.knowledge-card img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    background: var(--tan-300);
+}
+
+.knowledge-card-body {
+    padding: 0.75rem;
+    display: grid;
+    gap: 0.3rem;
+    min-width: 0;
+}
+
+.knowledge-title {
+    font-family: "Shippori Mincho", serif;
+    color: var(--brown-900);
+    font-size: 1rem;
+}
+
+.knowledge-meta,
+.knowledge-detail,
+.knowledge-related {
+    color: var(--brown-700);
+    font-size: 0.84rem;
+    line-height: 1.35;
+}
+
+.collapse-toggle-row {
+    margin-top: 0.9rem;
+    display: flex;
+    justify-content: center;
+}
+
+.collapse-toggle-btn.is-hidden {
+    display: none;
+}
+
+.is-collapsed-hidden {
+    display: none !important;
+}
+
+.mobile-toggle-panel {
+    display: none;
+}
+
+.mobile-toggle-group {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+}
+
+.mobile-toggle-btn.is-active {
+    box-shadow: 0 10px 20px var(--shadow-700);
 }
 
 .anime-card {
@@ -845,6 +982,11 @@ body[data-theme="dark"] .action-btn.integration {
         right: 0.65rem;
     }
 
+    .back-to-top {
+        right: 0.65rem;
+        bottom: max(0.65rem, env(safe-area-inset-bottom));
+    }
+
     .page-shell {
         width: min(1160px, 94vw);
         margin-top: -2.2rem;
@@ -866,6 +1008,10 @@ body[data-theme="dark"] .action-btn.integration {
     .endpoint-grid,
     .filter-grid,
     .anime-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dual-grid-shell {
         grid-template-columns: 1fr;
     }
 
@@ -927,6 +1073,79 @@ body[data-theme="dark"] .action-btn.integration {
     .anime-meta {
         font-size: 0.83rem;
         line-height: 1.35;
+    }
+
+    .knowledge-grid {
+        display: flex;
+        gap: 0.75rem;
+        overflow-x: auto;
+        padding: 0.1rem 0.1rem 0.72rem;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .knowledge-grid .state-note {
+        min-width: 100%;
+    }
+
+    .knowledge-card {
+        min-width: min(90vw, 360px);
+        grid-template-columns: 92px 1fr;
+        scroll-snap-align: start;
+        border-radius: 16px;
+    }
+
+    .knowledge-card img {
+        min-height: 112px;
+    }
+
+    .knowledge-title {
+        font-size: 0.95rem;
+    }
+
+    .knowledge-meta,
+    .knowledge-detail,
+    .knowledge-related {
+        font-size: 0.8rem;
+    }
+
+    .knowledge-grid::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .knowledge-grid::-webkit-scrollbar-thumb {
+        background: rgba(109, 68, 35, 0.35);
+        border-radius: 999px;
+    }
+
+    .knowledge-grid::-webkit-scrollbar-track {
+        background: rgba(109, 68, 35, 0.1);
+        border-radius: 999px;
+    }
+
+    .mobile-toggle-panel {
+        display: block;
+    }
+
+    .mobile-toggle-section.is-mobile-hidden {
+        display: none;
+    }
+
+    .mobile-toggle-note {
+        margin-top: 0.8rem;
+    }
+
+    .mobile-toggle-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .mobile-toggle-btn {
+        width: 100%;
+    }
+
+    .collapse-toggle-row {
+        display: none;
     }
 
     .anime-grid::-webkit-scrollbar {
@@ -1090,6 +1309,13 @@ body[data-theme="dark"] .action-btn.integration {
         right: 0.5rem;
     }
 
+    .back-to-top {
+        right: 0.5rem;
+        bottom: max(0.5rem, env(safe-area-inset-bottom));
+        min-width: 52px;
+        padding: 0.46rem 0.72rem;
+    }
+
     .theme-toggle-track {
         width: 52px;
         height: 28px;
@@ -1157,6 +1383,10 @@ body[data-theme="dark"] .action-btn.integration {
     .action-btn {
         min-height: 42px;
         padding: 0.52rem 0.8rem;
+    }
+
+    .mobile-toggle-group {
+        grid-template-columns: 1fr;
     }
 
     .response-viewer {

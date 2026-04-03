@@ -224,6 +224,14 @@
                     >
                         Try GET /api/feedback
                     </button>
+                    <button
+                        type="button"
+                        class="action-btn integration"
+                        data-method="GET"
+                        data-path="/api/studios-creators"
+                    >
+                        Try GET /api/studios-creators
+                    </button>
                 </div>
             </section>
 
@@ -254,7 +262,49 @@
                 >
             </section>
 
-            <section class="panel reveal delay" aria-labelledby="anime-heading">
+            <section
+                class="panel reveal mobile-toggle-panel"
+                aria-label="Mobile content toggle"
+            >
+                <div class="panel-header">
+                    <h2>Mobile Content Toggle</h2>
+                    <span class="panel-tag">Anime or Studios & Creators</span>
+                </div>
+                <div
+                    class="mobile-toggle-group"
+                    role="tablist"
+                    aria-label="Choose content section"
+                >
+                    <button
+                        id="animeMobileToggleBtn"
+                        type="button"
+                        class="action-btn primary mobile-toggle-btn is-active"
+                        aria-pressed="true"
+                        data-target="animePreviewSection"
+                    >
+                        Anime Series
+                    </button>
+                    <button
+                        id="studiosCreatorsMobileToggleBtn"
+                        type="button"
+                        class="action-btn ghost mobile-toggle-btn"
+                        aria-pressed="false"
+                        data-target="studiosCreatorsPreviewSection"
+                    >
+                        Studios & Creators
+                    </button>
+                </div>
+                <p class="state-note compact mobile-toggle-note">
+                    On phones, use this switch to show one data section at a
+                    time.
+                </p>
+            </section>
+
+            <section
+                id="animePreviewSection"
+                class="panel reveal delay mobile-toggle-section"
+                aria-labelledby="anime-heading"
+            >
                 <div class="panel-header">
                     <h2 id="anime-heading">
                         Anime Data Preview (GET /api/anime)
@@ -268,6 +318,90 @@
                     >
                 </div>
                 <div id="animeList" class="anime-grid"></div>
+                <div class="collapse-toggle-row">
+                    <button
+                        id="animeCollapseBtn"
+                        type="button"
+                        class="action-btn ghost collapse-toggle-btn"
+                        aria-expanded="false"
+                    >
+                        Show more anime
+                    </button>
+                </div>
+            </section>
+
+            <section
+                id="studiosCreatorsPreviewSection"
+                class="panel reveal"
+                aria-labelledby="studios-creators-heading"
+                data-mobile-order="second"
+            >
+                <div class="panel-header">
+                    <h2 id="studios-creators-heading">
+                        Studios & Creators Preview (GET /api/studios-creators)
+                    </h2>
+                    <a
+                        class="json-link"
+                        href="/api/studios-creators"
+                        target="_blank"
+                        rel="noreferrer"
+                        >Open /api/studios-creators</a
+                    >
+                </div>
+
+                <form id="studiosCreatorsSearchForm" class="search-row">
+                    <input
+                        id="studiosCreatorsSearchInput"
+                        type="search"
+                        placeholder="Search studios, creators, role, detail..."
+                        aria-label="Search studios and creators"
+                    />
+                    <button type="submit" class="action-btn primary">
+                        Search Data
+                    </button>
+                    <button
+                        id="clearStudiosCreatorsSearchBtn"
+                        type="button"
+                        class="action-btn ghost"
+                    >
+                        Clear
+                    </button>
+                </form>
+
+                <p id="studiosCreatorsMeta" class="state-note compact">
+                    Loading studios and creators data.
+                </p>
+
+                <div class="dual-grid-shell">
+                    <div>
+                        <h3 class="subheading">Studios</h3>
+                        <div id="studiosList" class="knowledge-grid"></div>
+                        <div class="collapse-toggle-row">
+                            <button
+                                id="studiosCollapseBtn"
+                                type="button"
+                                class="action-btn ghost collapse-toggle-btn"
+                                aria-expanded="false"
+                            >
+                                Show more studios
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="subheading">Creators</h3>
+                        <div id="creatorsList" class="knowledge-grid"></div>
+                        <div class="collapse-toggle-row">
+                            <button
+                                id="creatorsCollapseBtn"
+                                type="button"
+                                class="action-btn ghost collapse-toggle-btn"
+                                aria-expanded="false"
+                            >
+                                Show more creators
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </section>
         </main>
 
@@ -275,6 +409,15 @@
             <p>Anime Archive Backend API</p>
             <p>Express server on port 3001</p>
         </footer>
+
+        <button
+            id="backToTopBtn"
+            type="button"
+            class="back-to-top"
+            aria-label="Back to top"
+        >
+            Top
+        </button>
 
         <script src="app.js"></script>
     </body>
