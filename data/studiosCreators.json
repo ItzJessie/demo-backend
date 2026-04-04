@@ -1,0 +1,1451 @@
+{
+  "studios": [
+    {
+      "name": "Bones",
+      "image": "images/versions/studios/bones/bones-v0001.webp",
+      "meta": "Founding Year: 1998; Era: 2000s",
+      "detail": "Bones is known for high-energy action, sharp character animation, and series that balance style with emotional clarity.",
+      "related": [
+        "Fullmetal Alchemist",
+        "My Hero Academia",
+        "Mob Psycho 100",
+        "Soul Eater"
+      ],
+      "slug": "bones",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "bones",
+          "previousPath": "images/studios/bones.webp",
+          "nextPath": "images/versions/studios/bones/bones-v0001.webp",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/bones.webp",
+          "appliedAt": "2026-04-03T03:06:32.239Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "bones",
+      "imageSourcePath": "studios/bones.webp",
+      "imageVersionedPath": "images/versions/studios/bones/bones-v0001.webp"
+    },
+    {
+      "name": "MAPPA",
+      "image": "images/versions/studios/mappa/mappa-v0001.webp",
+      "meta": "Founding Year: 2011; Era: 2010s",
+      "detail": "MAPPA has become one of the most visible modern studios, especially for darker action series and high-profile adaptations.",
+      "related": [
+        "Chainsaw Man",
+        "Dororo"
+      ],
+      "slug": "mappa",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "mappa",
+          "previousPath": "images/studios/mappa.webp",
+          "nextPath": "images/versions/studios/mappa/mappa-v0001.webp",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/mappa.webp",
+          "appliedAt": "2026-04-03T03:06:32.241Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "mappa",
+      "imageSourcePath": "studios/mappa.webp",
+      "imageVersionedPath": "images/versions/studios/mappa/mappa-v0001.webp"
+    },
+    {
+      "name": "Kyoto Animation",
+      "image": "images/versions/studios/kyoto-animation/kyoto-animation-v0001.webp",
+      "meta": "Founding Year: 1981; Era: 1980s",
+      "detail": "Kyoto Animation is celebrated for polished visuals, expressive acting, and detailed slice-of-life storytelling.",
+      "related": [
+        "Violet Evergarden"
+      ],
+      "slug": "kyoto-animation",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "kyoto-animation",
+          "previousPath": "images/studios/kyoto-animation.webp",
+          "nextPath": "images/versions/studios/kyoto-animation/kyoto-animation-v0001.webp",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/kyoto-animation.webp",
+          "appliedAt": "2026-04-03T03:06:32.242Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "kyoto-animation",
+      "imageSourcePath": "studios/kyoto-animation.webp",
+      "imageVersionedPath": "images/versions/studios/kyoto-animation/kyoto-animation-v0001.webp"
+    },
+    {
+      "name": "Toei Animation",
+      "image": "images/versions/studios/toei-animation/toei-animation-v0001.webp",
+      "meta": "Founding Year: 1956; Era: 1950s",
+      "detail": "Toei Animation is one of the most influential studios in anime history and has helped define long-running shonen and classic franchises.",
+      "related": [
+        "Dragon Ball",
+        "Sailor Moon",
+        "Saint Seiya"
+      ],
+      "slug": "toei-animation",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "toei-animation",
+          "previousPath": "images/studios/toei-animation.webp",
+          "nextPath": "images/versions/studios/toei-animation/toei-animation-v0001.webp",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/toei-animation.webp",
+          "appliedAt": "2026-04-03T03:06:32.244Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "toei-animation",
+      "imageSourcePath": "studios/toei-animation.webp",
+      "imageVersionedPath": "images/versions/studios/toei-animation/toei-animation-v0001.webp"
+    },
+    {
+      "name": "ufotable",
+      "image": "images/versions/studios/ufotable/ufotable-v0001.webp",
+      "meta": "Founding Year: 2000; Era: 2000s",
+      "detail": "ufotable is recognized for striking compositing, fluid action, and detailed visual effects.",
+      "related": [
+        "Demon Slayer"
+      ],
+      "slug": "ufotable",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "ufotable",
+          "previousPath": "images/studios/ufotable.webp",
+          "nextPath": "images/versions/studios/ufotable/ufotable-v0001.webp",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/ufotable.webp",
+          "appliedAt": "2026-04-03T03:06:32.246Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "ufotable",
+      "imageSourcePath": "studios/ufotable.webp",
+      "imageVersionedPath": "images/versions/studios/ufotable/ufotable-v0001.webp"
+    },
+    {
+      "name": "Madhouse",
+      "image": "images/versions/studios/madhouse/madhouse.jpeg",
+      "meta": "Founding Year: 1972; Era: 1970s",
+      "detail": "Madhouse has produced a wide range of acclaimed titles, from psychological thrillers to modern action staples.",
+      "related": [
+        "One Punch Man",
+        "Hunter x Hunter",
+        "Death Note",
+        "Monster",
+        "Paranoia Agent"
+      ],
+      "slug": "madhouse",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "madhouse",
+          "previousPath": "images/studios/madhouse.png",
+          "nextPath": "images/versions/studios/madhouse/madhouse-v0001.png",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/madhouse.png",
+          "appliedAt": "2026-04-03T03:06:32.247Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "madhouse",
+      "imageSourcePath": "studios/madhouse.png",
+      "imageVersionedPath": "images/versions/studios/madhouse/madhouse.jpeg"
+    },
+    {
+      "name": "Production I.G",
+      "image": "images/versions/studios/production-i-g/production-I.G.png",
+      "meta": "Founding Year: 1987; Era: 1980s",
+      "detail": "Production I.G is known for polished sci-fi, cyberpunk, and action-oriented storytelling.",
+      "related": [
+        "Ghost in the Shell",
+        "Psycho-Pass"
+      ],
+      "slug": "production-i-g",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "production-i-g",
+          "previousPath": "images/studios/production-i-g.jpg",
+          "nextPath": "images/versions/studios/production-i-g/production-i-g-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/production-i-g.jpg",
+          "appliedAt": "2026-04-03T03:06:32.250Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "production-i-g",
+      "imageSourcePath": "studios/production-i-g.jpg",
+      "imageVersionedPath": "images/versions/studios/production-i-g/production-I.G.png"
+    },
+    {
+      "name": "Sunrise",
+      "image": "images/versions/studios/sunrise/sunrise.png",
+      "meta": "Founding Year: 1972; Era: 1970s",
+      "detail": "Sunrise is famous for mecha, space opera, and high-impact adventure series.",
+      "related": [
+        "Code Geass",
+        "Cowboy Bebop"
+      ],
+      "slug": "sunrise",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "sunrise",
+          "previousPath": "images/studios/sunrise.jpg",
+          "nextPath": "images/versions/studios/sunrise/sunrise-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/sunrise.jpg",
+          "appliedAt": "2026-04-03T03:06:32.257Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "sunrise",
+      "imageSourcePath": "wikimedia-commons:File:Sunrise logo.png",
+      "imageVersionedPath": "images/versions/studios/sunrise/sunrise.png"
+    },
+    {
+      "name": "Pierrot",
+      "image": "images/versions/studios/pierrot/pierrot.jpeg",
+      "meta": "Founding Year: 1979; Era: 1970s",
+      "detail": "Pierrot is strongly associated with long-running shonen titles and supernatural action series.",
+      "related": [
+        "Bleach"
+      ],
+      "slug": "pierrot",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "pierrot",
+          "previousPath": "images/studios/pierrot.jpg",
+          "nextPath": "images/versions/studios/pierrot/pierrot-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/pierrot.jpg",
+          "appliedAt": "2026-04-03T03:06:32.262Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "pierrot",
+      "imageSourcePath": "studios/pierrot.jpg",
+      "imageVersionedPath": "images/versions/studios/pierrot/pierrot.jpeg"
+    },
+    {
+      "name": "White Fox",
+      "image": "images/versions/studios/white-fox/white-fox.webp",
+      "meta": "Founding Year: 2007; Era: 2000s",
+      "detail": "White Fox has built a strong reputation for time-loop, fantasy, and thriller anime.",
+      "related": [
+        "Steins;Gate",
+        "Re:Zero - Starting Life in Another World",
+        "Jormungand"
+      ],
+      "slug": "white-fox",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "white-fox",
+          "previousPath": "images/studios/white-fox.jpg",
+          "nextPath": "images/versions/studios/white-fox/white-fox-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/white-fox.jpg",
+          "appliedAt": "2026-04-03T03:06:32.268Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "white-fox",
+      "imageSourcePath": "studios/white-fox.jpg",
+      "imageVersionedPath": "images/versions/studios/white-fox/white-fox.webp"
+    },
+    {
+      "name": "CloverWorks",
+      "image": "images/versions/studios/cloverworks/clover-works.jpeg",
+      "meta": "Founding Year: 2018; Era: 2010s",
+      "detail": "CloverWorks is known for clean design, expressive character work, and popular contemporary titles.",
+      "related": [
+        "Spy x Family",
+        "The Promised Neverland",
+        "Horimiya"
+      ],
+      "slug": "cloverworks",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "cloverworks",
+          "previousPath": "images/studios/cloverworks.png",
+          "nextPath": "images/versions/studios/cloverworks/cloverworks-v0001.png",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/cloverworks.png",
+          "appliedAt": "2026-04-03T03:06:32.272Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "cloverworks",
+      "imageSourcePath": "studios/cloverworks.png",
+      "imageVersionedPath": "images/versions/studios/cloverworks/clover-works.jpeg"
+    },
+    {
+      "name": "David Production",
+      "image": "images/versions/studios/david-production/david-production.png",
+      "meta": "Founding Year: 2007; Era: 2000s",
+      "detail": "David Production is best known for stylized action direction and unmistakable visual identity.",
+      "related": [
+        "JoJo's Bizarre Adventure",
+        "Fire Force"
+      ],
+      "slug": "david-production",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "david-production",
+          "previousPath": "images/studios/david-production.jpg",
+          "nextPath": "images/versions/studios/david-production/david-production-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/david-production.jpg",
+          "appliedAt": "2026-04-03T03:06:32.274Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "david-production",
+      "imageSourcePath": "wikimedia-commons:File:David Production Logo.png",
+      "imageVersionedPath": "images/versions/studios/david-production/david-production.png"
+    },
+    {
+      "name": "Science Saru",
+      "image": "images/versions/studios/science-saru/science-saru.png",
+      "meta": "Founding Year: 2013; Era: 2010s",
+      "detail": "Science Saru is recognized for bold visual experimentation and modern supernatural storytelling.",
+      "related": [
+        "Dandadan"
+      ],
+      "slug": "science-saru",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "science-saru",
+          "previousPath": "images/studios/science-saru.jpg",
+          "nextPath": "images/versions/studios/science-saru/science-saru-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/science-saru.jpg",
+          "appliedAt": "2026-04-03T03:06:32.282Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "science-saru",
+      "imageSourcePath": "studios/science-saru.jpg",
+      "imageVersionedPath": "images/versions/studios/science-saru/science-saru.png"
+    },
+    {
+      "name": "OLM",
+      "image": "images/versions/studios/olm/olm.png",
+      "meta": "Founding Year: 1990; Era: 1990s",
+      "detail": "OLM has produced family-friendly adventure series and more recent mystery and historical titles.",
+      "related": [
+        "Pokemon",
+        "The Apothecary Diaries"
+      ],
+      "slug": "olm",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "olm",
+          "previousPath": "images/studios/olm.jpg",
+          "nextPath": "images/versions/studios/olm/olm-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/olm.jpg",
+          "appliedAt": "2026-04-03T03:06:32.289Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "olm",
+      "imageSourcePath": "studios/olm.jpg",
+      "imageVersionedPath": "images/versions/studios/olm/olm.png"
+    },
+    {
+      "name": "Gainax",
+      "image": "images/versions/studios/gainax/gainax.webp",
+      "meta": "Founding Year: 1984; Era: 1980s",
+      "detail": "Gainax helped shape modern mecha and experimental anime storytelling.",
+      "related": [
+        "Neon Genesis Evangelion",
+        "Gurren Lagann",
+        "FLCL"
+      ],
+      "slug": "gainax",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "gainax",
+          "previousPath": "images/fallback.jpg",
+          "nextPath": "images/versions/studios/gainax/gainax-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "fallback.jpg",
+          "appliedAt": "2026-04-03T03:06:32.292Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "gainax",
+      "imageSourcePath": "fallback.jpg",
+      "imageVersionedPath": "images/versions/studios/gainax/gainax.webp"
+    },
+    {
+      "name": "A-1 Pictures",
+      "image": "images/versions/studios/a-1-pictures/a-1-picture.png",
+      "meta": "Founding Year: 2005; Era: 2000s",
+      "detail": "A-1 Pictures has handled a wide mix of contemporary action, fantasy, and drama titles.",
+      "related": [
+        "Blue Exorcist",
+        "Erased",
+        "Kaguya-sama: Love Is War"
+      ],
+      "slug": "a-1-pictures",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "a-1-pictures",
+          "previousPath": "images/studios/a-1-pictures.jpg",
+          "nextPath": "images/versions/studios/a-1-pictures/a-1-pictures-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/a-1-pictures.jpg",
+          "appliedAt": "2026-04-03T03:06:32.299Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "a-1-pictures",
+      "imageSourcePath": "studios/a-1-pictures.jpg",
+      "imageVersionedPath": "images/versions/studios/a-1-pictures/a-1-picture.png"
+    },
+    {
+      "name": "Mushi Production",
+      "image": "images/versions/studios/mushi-production/mushi-production.png",
+      "meta": "Founding Year: 1977; Era: 1970s",
+      "detail": "Mushi Production is tied to foundational works in sports and drama anime history.",
+      "related": [
+        "Ashita no Joe"
+      ],
+      "slug": "mushi-production",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "mushi-production",
+          "previousPath": "images/studios/mushi-production.jpg",
+          "nextPath": "images/versions/studios/mushi-production/mushi-production-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/mushi-production.jpg",
+          "appliedAt": "2026-04-03T03:06:32.302Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "mushi-production",
+      "imageSourcePath": "studios/mushi-production.jpg",
+      "imageVersionedPath": "images/versions/studios/mushi-production/mushi-production.png"
+    },
+    {
+      "name": "TMS Entertainment",
+      "image": "images/versions/studios/tms-entertainment/tms-entertainment-v0001.png",
+      "meta": "Founding Year: 1946; Era: 1940s",
+      "detail": "TMS Entertainment has a long history across action, mystery, and long-running franchises.",
+      "related": [
+        "D.Gray-man",
+        "Dr. Stone"
+      ],
+      "slug": "tms-entertainment",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "tms-entertainment",
+          "previousPath": "images/studios/tms-entertainment.png",
+          "nextPath": "images/versions/studios/tms-entertainment/tms-entertainment-v0001.png",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/tms-entertainment.png",
+          "appliedAt": "2026-04-03T03:06:32.304Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "tms-entertainment",
+      "imageSourcePath": "studios/tms-entertainment.png",
+      "imageVersionedPath": "images/versions/studios/tms-entertainment/tms-entertainment-v0001.png"
+    },
+    {
+      "name": "Brain's Base",
+      "image": "images/versions/studios/brain-s-base/brains-base.png",
+      "meta": "Founding Year: 1996; Era: 1990s",
+      "detail": "Brain's Base has produced memorable mystery and character-focused series.",
+      "related": [
+        "Durarara!!",
+        "Baccano!",
+        "Natsume's Book of Friends"
+      ],
+      "slug": "brain-s-base",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "brain-s-base",
+          "previousPath": "images/studios/brain-s-base.jpg",
+          "nextPath": "images/versions/studios/brain-s-base/brain-s-base-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/brain-s-base.jpg",
+          "appliedAt": "2026-04-03T03:06:32.310Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "brain-s-base",
+      "imageSourcePath": "wikimedia-commons:File:Brain's Base logo.svg",
+      "imageVersionedPath": "images/versions/studios/brain-s-base/brains-base.png"
+    },
+    {
+      "name": "Bind",
+      "image": "images/versions/studios/bind/bind.png",
+      "meta": "Founding Year: 2018; Era: 2010s",
+      "detail": "Bind is closely associated with Mushoku Tensei.",
+      "related": [
+        "Mushoku Tensei"
+      ],
+      "slug": "bind",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "bind",
+          "previousPath": "images/fallback.jpg",
+          "nextPath": "images/versions/studios/bind/bind-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "fallback.jpg",
+          "appliedAt": "2026-04-03T03:06:32.311Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "bind",
+      "imageSourcePath": "fallback.jpg",
+      "imageVersionedPath": "images/versions/studios/bind/bind.png"
+    },
+    {
+      "name": "Manglobe",
+      "image": "images/versions/studios/manglobe/manglobe-v0001.png",
+      "meta": "Founding Year: 2002; Era: 2000s",
+      "detail": "Manglobe is known for distinct visual style and atmospheric sci-fi storytelling.",
+      "related": [
+        "Ergo Proxy"
+      ],
+      "slug": "manglobe",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "manglobe",
+          "previousPath": "images/studios/manglobe.png",
+          "nextPath": "images/versions/studios/manglobe/manglobe-v0001.png",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/manglobe.png",
+          "appliedAt": "2026-04-03T03:06:32.312Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "manglobe",
+      "imageSourcePath": "studios/manglobe.png",
+      "imageVersionedPath": "images/versions/studios/manglobe/manglobe-v0001.png"
+    },
+    {
+      "name": "Gonzo",
+      "image": "images/versions/studios/gonzo/gonzo.jpeg",
+      "meta": "Founding Year: 1992; Era: 1990s",
+      "detail": "Gonzo is known for a wide range of adventure, thriller, and early 2000s cult-favorite anime.",
+      "related": [
+        "Welcome to the NHK",
+        "Hellsing"
+      ],
+      "slug": "gonzo",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "gonzo",
+          "previousPath": "images/fallback.jpg",
+          "nextPath": "images/versions/studios/gonzo/gonzo-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "fallback.jpg",
+          "appliedAt": "2026-04-03T03:06:32.313Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "gonzo",
+      "imageSourcePath": "wikimedia-commons:File:Gonzo studio logo.png",
+      "imageVersionedPath": "images/versions/studios/gonzo/gonzo.jpeg"
+    },
+    {
+      "name": "Shaft",
+      "image": "images/versions/studios/shaft/shaft.png",
+      "meta": "Founding Year: 1975; Era: 1970s",
+      "detail": "Shaft is recognized for stylized direction and experimental visual language.",
+      "related": [
+        "Puella Magi Madoka Magica: Beginnings"
+      ],
+      "slug": "shaft",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "shaft",
+          "previousPath": "images/studios/shaft.jpg",
+          "nextPath": "images/versions/studios/shaft/shaft-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/shaft.jpg",
+          "appliedAt": "2026-04-03T03:06:32.317Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "shaft",
+      "imageSourcePath": "studios/shaft.jpg",
+      "imageVersionedPath": "images/versions/studios/shaft/shaft.png"
+    },
+    {
+      "name": "Trigger",
+      "image": "images/versions/studios/trigger/trigger.png",
+      "meta": "Founding Year: 2011; Era: 2010s",
+      "detail": "Trigger is known for kinetic animation and bold sci-fi action.",
+      "related": [
+        "Cyberpunk: Edgerunners"
+      ],
+      "slug": "trigger",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "studios",
+          "stableKeyField": "slug",
+          "stableKey": "trigger",
+          "previousPath": "images/studios/trigger.jpg",
+          "nextPath": "images/versions/studios/trigger/trigger-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "studios/trigger.jpg",
+          "appliedAt": "2026-04-03T03:06:32.325Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "trigger",
+      "imageSourcePath": "wikimedia-commons:File:Logo of the Trigger anime studio.svg",
+      "imageVersionedPath": "images/versions/studios/trigger/trigger.png"
+    }
+  ],
+  "creators": [
+    {
+      "name": "Eiichiro Oda",
+      "image": "images/versions/creators/eiichiro-oda/eiichiro-oda-v0001.png",
+      "role": "Role: Writer, Mangaka, Creator",
+      "affiliation": "Studio Affiliations: Professional mangaka affiliated with Shueisha.",
+      "detail": "Creator of One Piece, one of the best-selling manga series of all time.",
+      "related": [
+        "One Piece"
+      ],
+      "slug": "eiichiro-oda",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "eiichiro-oda",
+          "previousPath": "images/creators/eiichiro-oda.png",
+          "nextPath": "images/versions/creators/eiichiro-oda/eiichiro-oda-v0001.png",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/eiichiro-oda.png",
+          "appliedAt": "2026-04-03T03:06:32.328Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "eiichiro-oda",
+      "imageSourcePath": "creators/eiichiro-oda.png",
+      "imageVersionedPath": "images/versions/creators/eiichiro-oda/eiichiro-oda-v0001.png"
+    },
+    {
+      "name": "Hideaki Anno",
+      "image": "images/versions/creators/hideaki-anno/hideaki-anno-v0001.webp",
+      "role": "Role: Director, Writer, Producer",
+      "affiliation": "Studio Affiliations: Founded Gainax and later led Khara projects.",
+      "detail": "Known for Neon Genesis Evangelion and its existential, psychological storytelling.",
+      "related": [
+        "Neon Genesis Evangelion"
+      ],
+      "slug": "hideaki-anno",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "hideaki-anno",
+          "previousPath": "images/creators/hideaki-anno.webp",
+          "nextPath": "images/versions/creators/hideaki-anno/hideaki-anno-v0001.webp",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/hideaki-anno.webp",
+          "appliedAt": "2026-04-03T03:06:32.329Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "hideaki-anno",
+      "imageSourcePath": "creators/hideaki-anno.webp",
+      "imageVersionedPath": "images/versions/creators/hideaki-anno/hideaki-anno-v0001.webp"
+    },
+    {
+      "name": "Yoshihiro Togashi",
+      "image": "images/versions/creators/yoshihiro-togashi/yoshihiro-togashi.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shueisha's Weekly Shonen Jump.",
+      "detail": "Creator of Yu Yu Hakusho and Hunter x Hunter.",
+      "related": [
+        "Hunter x Hunter"
+      ],
+      "slug": "yoshihiro-togashi",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "yoshihiro-togashi",
+          "previousPath": "images/creators/yoshihiro-togashi.webp",
+          "nextPath": "images/versions/creators/yoshihiro-togashi/yoshihiro-togashi-v0001.webp",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/yoshihiro-togashi.webp",
+          "appliedAt": "2026-04-03T03:06:32.331Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "yoshihiro-togashi",
+      "imageSourcePath": null,
+      "imageVersionedPath": "images/versions/creators/yoshihiro-togashi/yoshihiro-togashi.webp"
+    },
+    {
+      "name": "Kohei Horikoshi",
+      "image": "images/versions/creators/kohei-horikoshi/kohei-horikoshi-v0001.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shueisha's Weekly Shonen Jump.",
+      "detail": "Creator of My Hero Academia.",
+      "related": [
+        "My Hero Academia"
+      ],
+      "slug": "kohei-horikoshi",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "kohei-horikoshi",
+          "previousPath": "images/creators/kohei-horikoshi.webp",
+          "nextPath": "images/versions/creators/kohei-horikoshi/kohei-horikoshi-v0001.webp",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/kohei-horikoshi.webp",
+          "appliedAt": "2026-04-03T03:06:32.334Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "kohei-horikoshi",
+      "imageSourcePath": null,
+      "imageVersionedPath": "images/versions/creators/kohei-horikoshi/kohei-horikoshi-v0001.webp"
+    },
+    {
+      "name": "Kunihiko Ikuhara",
+      "image": "images/versions/creators/kunihiko-ikuhara/kunihiko-ikuhara-v0001.jpeg",
+      "role": "Role: Director, Writer, Producer",
+      "affiliation": "Studio Affiliations: Directed for Toei Animation and later independent projects.",
+      "detail": "Known for Sailor Moon and highly symbolic storytelling.",
+      "related": [
+        "Sailor Moon",
+        "Revolutionary Girl Utena"
+      ],
+      "slug": "kunihiko-ikuhara",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "kunihiko-ikuhara",
+          "previousPath": "images/creators/kunihiko-ikuhara.jpeg",
+          "nextPath": "images/versions/creators/kunihiko-ikuhara/kunihiko-ikuhara-v0001.jpeg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/kunihiko-ikuhara.jpeg",
+          "appliedAt": "2026-04-03T03:06:32.335Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "kunihiko-ikuhara",
+      "imageSourcePath": "creators/kunihiko-ikuhara.png",
+      "imageVersionedPath": "images/versions/creators/kunihiko-ikuhara/kunihiko-ikuhara-v0001.jpeg"
+    },
+    {
+      "name": "Haruo Sotozaki",
+      "image": "images/versions/creators/haruo-sotozaki/haruo-sotozaki-v0001.webp",
+      "role": "Role: Director, Producer",
+      "affiliation": "Studio Affiliations: Director at ufotable.",
+      "detail": "Director of Demon Slayer's modern anime adaptation and film work.",
+      "related": [
+        "Demon Slayer"
+      ],
+      "slug": "haruo-sotozaki",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "haruo-sotozaki",
+          "previousPath": "images/creators/haruo-sotozaki.webp",
+          "nextPath": "images/versions/creators/haruo-sotozaki/haruo-sotozaki-v0001.webp",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/haruo-sotozaki.webp",
+          "appliedAt": "2026-04-03T03:06:32.337Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "haruo-sotozaki",
+      "imageSourcePath": "creators/haruo-sotozaki.webp",
+      "imageVersionedPath": "images/versions/creators/haruo-sotozaki/haruo-sotozaki-v0001.webp"
+    },
+    {
+      "name": "Tite Kubo",
+      "image": "images/versions/creators/tite-kubo/tite-kubo.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shueisha.",
+      "detail": "Creator of Bleach.",
+      "related": [
+        "Bleach"
+      ],
+      "slug": "tite-kubo",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "tite-kubo",
+          "previousPath": "images/creators/tite-kubo.jpg",
+          "nextPath": "images/versions/creators/tite-kubo/tite-kubo-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/tite-kubo.jpg",
+          "appliedAt": "2026-04-03T03:06:32.339Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "tite-kubo",
+      "imageSourcePath": "creators/tite-kubo.jpg",
+      "imageVersionedPath": "images/versions/creators/tite-kubo/tite-kubo.webp"
+    },
+    {
+      "name": "Tatsuki Fujimoto",
+      "image": "images/versions/creators/tatsuki-fujimoto/tatsuki-fujimoto.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shueisha.",
+      "detail": "Creator of Chainsaw Man.",
+      "related": [
+        "Chainsaw Man"
+      ],
+      "slug": "tatsuki-fujimoto",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "tatsuki-fujimoto",
+          "previousPath": "images/creators/tatsuki-fujimoto.png",
+          "nextPath": "images/versions/creators/tatsuki-fujimoto/tatsuki-fujimoto-v0001.png",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/tatsuki-fujimoto.png",
+          "appliedAt": "2026-04-03T03:06:32.342Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "tatsuki-fujimoto",
+      "imageSourcePath": null,
+      "imageVersionedPath": "images/versions/creators/tatsuki-fujimoto/tatsuki-fujimoto.webp"
+    },
+    {
+      "name": "Yuki Tabata",
+      "image": "images/versions/creators/yuki-tabata/yuki-tabata.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shueisha.",
+      "detail": "Creator of Black Clover.",
+      "related": [
+        "Black Clover"
+      ],
+      "slug": "yuki-tabata",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "yuki-tabata",
+          "previousPath": "images/fallback.jpg",
+          "nextPath": "images/versions/creators/yuki-tabata/yuki-tabata-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "fallback.jpg",
+          "appliedAt": "2026-04-03T03:06:32.343Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "yuki-tabata",
+      "imageSourcePath": null,
+      "imageVersionedPath": "images/versions/creators/yuki-tabata/yuki-tabata.webp"
+    },
+    {
+      "name": "Naoko Takeuchi",
+      "image": "images/versions/creators/naoko-takeuchi/naoko-takeuchi.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Kodansha and later Shueisha-related media.",
+      "detail": "Creator of Sailor Moon.",
+      "related": [
+        "Sailor Moon"
+      ],
+      "slug": "naoko-takeuchi",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "naoko-takeuchi",
+          "previousPath": "images/creators/naoko-takeuchi.png",
+          "nextPath": "images/versions/creators/naoko-takeuchi/naoko-takeuchi-v0001.png",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/naoko-takeuchi.png",
+          "appliedAt": "2026-04-03T03:06:32.345Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "naoko-takeuchi",
+      "imageSourcePath": "creators/naoko-takeuchi.png",
+      "imageVersionedPath": "images/versions/creators/naoko-takeuchi/naoko-takeuchi.webp"
+    },
+    {
+      "name": "Hirohiko Araki",
+      "image": "images/versions/creators/hirohiko-araki/hirohiko-araki-v01.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shueisha.",
+      "detail": "Creator of JoJo's Bizarre Adventure.",
+      "related": [
+        "JoJo's Bizarre Adventure"
+      ],
+      "slug": "hirohiko-araki",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "hirohiko-araki",
+          "previousPath": "images/creators/hirohiko-araki.png",
+          "nextPath": "images/versions/creators/hirohiko-araki/hirohiko-araki-v0001.png",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/hirohiko-araki.png",
+          "appliedAt": "2026-04-03T03:06:32.347Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "hirohiko-araki",
+      "imageSourcePath": "creators/hirohiko-araki.png",
+      "imageVersionedPath": "images/versions/creators/hirohiko-araki/hirohiko-araki-v01.webp"
+    },
+    {
+      "name": "Satoshi Kon",
+      "image": "images/versions/creators/satoshi-kon/satoshi-kon.webp",
+      "role": "Role: Director, Writer",
+      "affiliation": "Studio Affiliations: Worked with Madhouse on key projects.",
+      "detail": "Known for psychological works that blur reality and performance.",
+      "related": [
+        "Paranoia Agent"
+      ],
+      "slug": "satoshi-kon",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "satoshi-kon",
+          "previousPath": "images/creators/satoshi-kon.png",
+          "nextPath": "images/versions/creators/satoshi-kon/satoshi-kon-v0001.png",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/satoshi-kon.png",
+          "appliedAt": "2026-04-03T03:06:32.349Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "satoshi-kon",
+      "imageSourcePath": "creators/satoshi-kon.png",
+      "imageVersionedPath": "images/versions/creators/satoshi-kon/satoshi-kon.webp"
+    },
+    {
+      "name": "Atsushi Ohkubo",
+      "image": "images/versions/creators/atsushi-ohkubo/atsushi-ohkubo.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Square Enix and later adapted widely.",
+      "detail": "Creator of Soul Eater and Fire Force.",
+      "related": [
+        "Soul Eater",
+        "Fire Force"
+      ],
+      "slug": "atsushi-ohkubo",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "atsushi-ohkubo",
+          "previousPath": "images/fallback.jpg",
+          "nextPath": "images/versions/creators/atsushi-ohkubo/atsushi-ohkubo-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "fallback.jpg",
+          "appliedAt": "2026-04-03T03:06:32.349Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "atsushi-ohkubo",
+      "imageSourcePath": "creators/atsushi-ohkubo.jpg",
+      "imageVersionedPath": "images/versions/creators/atsushi-ohkubo/atsushi-ohkubo.webp"
+    },
+    {
+      "name": "Shinichiro Watanabe",
+      "image": "images/versions/creators/shinichiro-watanabe/shinichiro-watanabe.webp",
+      "role": "Role: Director, Writer",
+      "affiliation": "Studio Affiliations: Worked with Sunrise and other major studios.",
+      "detail": "Known for genre-blending music-driven series.",
+      "related": [
+        "Cowboy Bebop",
+        "Space Dandy"
+      ],
+      "slug": "shinichiro-watanabe",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "shinichiro-watanabe",
+          "previousPath": "images/creators/shinichiro-watanabe.png",
+          "nextPath": "images/versions/creators/shinichiro-watanabe/shinichiro-watanabe-v0001.png",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/shinichiro-watanabe.png",
+          "appliedAt": "2026-04-03T03:06:32.351Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "shinichiro-watanabe",
+      "imageSourcePath": "creators/shinichiro-watanabe.png",
+      "imageVersionedPath": "images/versions/creators/shinichiro-watanabe/shinichiro-watanabe.webp"
+    },
+    {
+      "name": "Rei Hiroe",
+      "image": "images/versions/creators/rei-hiroe/rei-hiroe.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Square Enix.",
+      "detail": "Creator of Black Lagoon.",
+      "related": [
+        "Black Lagoon"
+      ],
+      "slug": "rei-hiroe",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "rei-hiroe",
+          "previousPath": "images/fallback.jpg",
+          "nextPath": "images/versions/creators/rei-hiroe/rei-hiroe-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "fallback.jpg",
+          "appliedAt": "2026-04-03T03:06:32.352Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "rei-hiroe",
+      "imageSourcePath": null,
+      "imageVersionedPath": "images/versions/creators/rei-hiroe/rei-hiroe.webp"
+    },
+    {
+      "name": "Koyoharu Gotouge",
+      "image": "images/versions/creators/koyoharu-gotouge/koyoharu-gotouge.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shueisha.",
+      "detail": "Creator of Demon Slayer.",
+      "related": [
+        "Demon Slayer"
+      ],
+      "slug": "koyoharu-gotouge",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "koyoharu-gotouge",
+          "previousPath": "images/creators/koyoharu-gotouge.jpg",
+          "nextPath": "images/versions/creators/koyoharu-gotouge/koyoharu-gotouge-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/koyoharu-gotouge.jpg",
+          "appliedAt": "2026-04-03T03:06:32.371Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "koyoharu-gotouge",
+      "imageSourcePath": "creators/koyoharu-gotouge.jpg",
+      "imageVersionedPath": "images/versions/creators/koyoharu-gotouge/koyoharu-gotouge.webp"
+    },
+    {
+      "name": "Yukinobu Tatsu",
+      "image": "images/versions/creators/yukinobu-tatsu/yukinobu-tatsu.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shueisha.",
+      "detail": "Creator of Dandadan.",
+      "related": [
+        "Dandadan"
+      ],
+      "slug": "yukinobu-tatsu",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "yukinobu-tatsu",
+          "previousPath": "images/creators/yukinobu-tatsu.png",
+          "nextPath": "images/versions/creators/yukinobu-tatsu/yukinobu-tatsu-v0001.png",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/yukinobu-tatsu.png",
+          "appliedAt": "2026-04-03T03:06:32.378Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "yukinobu-tatsu",
+      "imageSourcePath": null,
+      "imageVersionedPath": "images/versions/creators/yukinobu-tatsu/yukinobu-tatsu.webp"
+    },
+    {
+      "name": "Tsugumi Ohba",
+      "image": "images/versions/creators/tsugumi-ohba/tsugumi-ohba-v0001.jpg",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shueisha.",
+      "detail": "Writer behind Death Note.",
+      "related": [
+        "Death Note"
+      ],
+      "slug": "tsugumi-ohba",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "tsugumi-ohba",
+          "previousPath": "images/creators/tsugumi-ohba.jpg",
+          "nextPath": "images/versions/creators/tsugumi-ohba/tsugumi-ohba-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/tsugumi-ohba.jpg",
+          "appliedAt": "2026-04-03T03:06:32.380Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "tsugumi-ohba",
+      "imageSourcePath": "creators/tsugumi-ohba.jpg",
+      "imageVersionedPath": "images/versions/creators/tsugumi-ohba/tsugumi-ohba-v0001.jpg"
+    },
+    {
+      "name": "Naoki Urasawa",
+      "image": "images/versions/creators/naoki-urasawa/naoki-urasawa-v0001.jpg",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shogakukan.",
+      "detail": "Creator of Monster and a major name in psychological suspense manga.",
+      "related": [
+        "Monster"
+      ],
+      "slug": "naoki-urasawa",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "naoki-urasawa",
+          "previousPath": "images/creators/naoki-urasawa.jpg",
+          "nextPath": "images/versions/creators/naoki-urasawa/naoki-urasawa-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/naoki-urasawa.jpg",
+          "appliedAt": "2026-04-03T03:06:32.389Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "naoki-urasawa",
+      "imageSourcePath": "creators/naoki-urasawa.jpg",
+      "imageVersionedPath": "images/versions/creators/naoki-urasawa/naoki-urasawa-v0001.jpg"
+    },
+    {
+      "name": "Gege Akutami",
+      "image": "images/versions/creators/gege-akutami/gege-akutami.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shueisha.",
+      "detail": "Creator of Jujutsu Kaisen.",
+      "related": [
+        "Jujutsu Kaisen"
+      ],
+      "slug": "gege-akutami",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "gege-akutami",
+          "previousPath": "images/creators/gege-akutami.jpg",
+          "nextPath": "images/versions/creators/gege-akutami/gege-akutami-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/gege-akutami.jpg",
+          "appliedAt": "2026-04-03T03:06:32.393Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "gege-akutami",
+      "imageSourcePath": "creators/gege-akutami.png",
+      "imageVersionedPath": "images/versions/creators/gege-akutami/gege-akutami.webp"
+    },
+    {
+      "name": "Masashi Kishimoto",
+      "image": "images/versions/creators/masashi-kishimoto/masashi-kishimoto.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shueisha.",
+      "detail": "Creator of Naruto and Boruto.",
+      "related": [
+        "Naruto"
+      ],
+      "slug": "masashi-kishimoto",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "masashi-kishimoto",
+          "previousPath": "images/creators/masashi-kishimoto.jpg",
+          "nextPath": "images/versions/creators/masashi-kishimoto/masashi-kishimoto-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/masashi-kishimoto.jpg",
+          "appliedAt": "2026-04-03T03:06:32.395Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "masashi-kishimoto",
+      "imageSourcePath": "creators/masashi-kishimoto.jpg",
+      "imageVersionedPath": "images/versions/creators/masashi-kishimoto/masashi-kishimoto.webp"
+    },
+    {
+      "name": "Rumiko Takahashi",
+      "image": "images/versions/creators/rumiko-takahashi/rumiko-takahashi.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shogakukan.",
+      "detail": "One of the most influential manga creators in modern anime history.",
+      "related": [
+        "Inuyasha"
+      ],
+      "slug": "rumiko-takahashi",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "rumiko-takahashi",
+          "previousPath": "images/creators/rumiko-takahashi.jpg",
+          "nextPath": "images/versions/creators/rumiko-takahashi/rumiko-takahashi-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "creators/rumiko-takahashi.jpg",
+          "appliedAt": "2026-04-03T03:06:32.397Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "rumiko-takahashi",
+      "imageSourcePath": "creators/rumiko-takahashi.jpg",
+      "imageVersionedPath": "images/versions/creators/rumiko-takahashi/rumiko-takahashi.webp"
+    },
+    {
+      "name": "Sui Ishida",
+      "image": "images/versions/creators/sui-ishida/sui-ishida.webp",
+      "role": "Role: Writer, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shueisha.",
+      "detail": "Creator of Tokyo Ghoul.",
+      "related": [
+        "Tokyo Ghoul"
+      ],
+      "slug": "sui-ishida",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "sui-ishida",
+          "previousPath": "images/fallback.jpg",
+          "nextPath": "images/versions/creators/sui-ishida/sui-ishida-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "fallback.jpg",
+          "appliedAt": "2026-04-03T03:06:32.398Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "sui-ishida",
+      "imageSourcePath": "creators/sui-ishida.jpg",
+      "imageVersionedPath": "images/versions/creators/sui-ishida/sui-ishida.webp"
+    },
+    {
+      "name": "Yusuke Murata",
+      "image": "images/versions/creators/yusuke-murata/yusuke-murata.webp",
+      "role": "Role: Artist, Mangaka",
+      "affiliation": "Studio Affiliations: Published through Shueisha.",
+      "detail": "Artist of One Punch Man's manga adaptation.",
+      "related": [
+        "One Punch Man"
+      ],
+      "slug": "yusuke-murata",
+      "imageVersion": 1,
+      "imageHistory": [
+        {
+          "batchId": "d260817e-afa7-47a2-b05f-354c1496380a",
+          "category": "creators",
+          "stableKeyField": "slug",
+          "stableKey": "yusuke-murata",
+          "previousPath": "images/fallback.jpg",
+          "nextPath": "images/versions/creators/yusuke-murata/yusuke-murata-v0001.jpg",
+          "previousVersion": 0,
+          "nextVersion": 1,
+          "sourcePath": "fallback.jpg",
+          "appliedAt": "2026-04-03T03:06:32.399Z"
+        }
+      ],
+      "imageStableKeyField": "slug",
+      "imageStableKey": "yusuke-murata",
+      "imageSourcePath": null,
+      "imageVersionedPath": "images/versions/creators/yusuke-murata/yusuke-murata.webp"
+    }
+  ]
+}

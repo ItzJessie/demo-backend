@@ -10,6 +10,8 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3001;
 const FEEDBACK_DIR = path.join(__dirname, "feedbacks");
 const ANIME_FILE = path.join(__dirname, "data", "animeSeries.json");
+const STUDIOS_CREATORS_FILE =
+  process.env.STUDIOS_CREATORS_FILE || path.join(__dirname, "data", "studiosCreators.json");
 
 const MONGODB_URI = process.env.MONGODB_URI;
 const MONGODB_DB = process.env.MONGODB_DB || "anime_archive";
@@ -70,6 +72,21 @@ async function loadAnimeList() {
   return parsed;
 }
 
+async function loadStudiosCreators() {
+  const raw = await fs.readFile(STUDIOS_CREATORS_FILE, "utf8");
+  const parsed = JSON.parse(raw);
+
+  if (!parsed || typeof parsed !== "object") {
+    throw new Error("Studios/creators data file must be a JSON object");
+  }
+
+  if (!Array.isArray(parsed.studios) || !Array.isArray(parsed.creators)) {
+    throw new Error("Studios/creators data file must include studios[] and creators[]");
+  }
+
+  return parsed;
+}
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
@@ -84,6 +101,16 @@ app.get("/api/anime", async (_req, res) => {
   }
 });
 
+app.get("/api/studios-creators", async (_req, res) => {
+  try {
+    const studiosCreators = await loadStudiosCreators();
+    res.json(studiosCreators);
+  } catch (err) {
+    console.error("Error loading studios/creators data", err);
+    res.status(500).json({ error: "Failed to load studios/creators records" });
+  }
+});
+
 app.get("/api/routes", (_req, res) => {
   res.json({
     name: "Anime Archive Backend API",
@@ -93,6 +120,11 @@ app.get("/api/routes", (_req, res) => {
         method: "GET",
         path: "/api/anime",
         description: "Get all anime records",
+      },
+      {
+        method: "GET",
+        path: "/api/studios-creators",
+        description: "Get studios and creators records",
       },
       {
         method: "GET",
@@ -198,16 +230,40 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Anime Archive Backend Server is running on http://localhost:${PORT}`);
-  if (!MONGODB_URI) {
-    console.log("MONGODB_URI not set. Feedback will still save locally under /feedbacks.");
-  }
-});
+let hasSignalHandler = false;
 
-process.on("SIGINT", async () => {
-  if (mongoClient) {
-    await mongoClient.close();
+function registerSignalHandler() {
+  if (hasSignalHandler) {
+    return;
   }
-  process.exit(0);
-});
+
+  process.on("SIGINT", async () => {
+    if (mongoClient) {
+      await mongoClient.close();
+    }
+    process.exit(0);
+  });
+
+  hasSignalHandler = true;
+}
+
+function startServer(port = PORT) {
+  registerSignalHandler();
+  const server = app.listen(port, () => {
+    console.log(`Anime Archive Backend Server is running on http://localhost:${port}`);
+    if (!MONGODB_URI) {
+      console.log("MONGODB_URI not set. Feedback will still save locally under /feedbacks.");
+    }
+  });
+
+  return server;
+}
+
+if (require.main === module) {
+  startServer();
+}
+
+module.exports = {
+  app,
+  startServer,
+};

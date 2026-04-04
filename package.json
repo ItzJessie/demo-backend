@@ -5,8 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "dedupe:image-refs": "node scripts/dedupe-anime-image-refs.js",
+    "sync:images": "node scripts/sync-image-assets.js",
+    "repair:anime-covers": "node scripts/repair-anime-covers.js",
+    "repair:creator-images": "node scripts/repair-creator-images.js",
+    "image-remap": "node scripts/image-remap.js",
     "verify:images": "node scripts/verify-anime-images.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test",
+    "verify": "npm test && npm run verify:images"
   },
   "keywords": [
     "anime",

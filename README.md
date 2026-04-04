@@ -75,6 +75,26 @@ GET /api/anime
 curl http://localhost:3001/api/anime
 ```
 
+### 🏢 Get Studios and Creators
+```
+GET /api/studios-creators
+```
+
+**Response**: JSON object with `studios` and `creators` arrays
+
+**Data source**: `data/studiosCreators.json` by default.
+
+Optional override in `.env`:
+
+```env
+STUDIOS_CREATORS_FILE=/absolute/path/to/studiosCreators.json
+```
+
+**Example**:
+```bash
+curl http://localhost:3001/api/studios-creators
+```
+
 ### 🔍 Get Specific Anime by ID
 ```
 GET /api/anime/:id
@@ -197,6 +217,25 @@ What it checks:
 - Suspicious title-to-filename mismatches (heuristic keyword check)
 
 Tip: if your filenames are numeric or generic, this command helps you catch likely mismatches and review them manually.
+
+## 🖼️ Sync Image Assets
+
+If you want to regenerate predictable image paths and download missing artwork from Wikipedia, run:
+
+```bash
+npm run sync:images
+```
+
+This script:
+
+- Saves anime images to `public/images/anime`
+- Saves studio logos to `public/images/studios`
+- Saves creator portraits to `public/images/creators`
+- Reuses existing files when possible
+- Logs missing image matches to `scripts/logs/image-sync-missing.json`
+- Adds a local `public/images/fallback.jpg` placeholder if one is missing
+
+The script also rewrites the JSON image references so the frontend can keep auto-loading from the stored paths.
 
 ## 💾 Feedback Storage
 
