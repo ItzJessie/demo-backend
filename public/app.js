@@ -1,4 +1,5 @@
-const API_BASE = "/api";
+const API_SERVER_ORIGIN = "https://demo-backend-1-0t5d.onrender.com";
+const API_BASE = `${API_SERVER_ORIGIN}/api`;
 const THEME_STORAGE_KEY = "animePortalTheme";
 const MOBILE_SECTION_STORAGE_KEY = "animePortalMobileSection";
 const MOBILE_SECTION_QUERY = "(max-width: 640px)";
@@ -971,7 +972,8 @@ async function executeEndpoint(method, rawPath) {
     const started = performance.now();
 
     try {
-        const res = await fetch(path, options);
+        const targetUrl = buildApiUrl(path);
+        const res = await fetch(targetUrl, options);
         const elapsedMs = Math.round(performance.now() - started);
         const contentType = res.headers.get("content-type") || "";
 
@@ -982,11 +984,11 @@ async function executeEndpoint(method, rawPath) {
             payload = { raw: await res.text() };
         }
 
-        responseMeta.textContent = `${method} ${path} • ${res.status} ${res.statusText} • ${elapsedMs} ms`;
+        responseMeta.textContent = `${method} ${targetUrl} • ${res.status} ${res.statusText} • ${elapsedMs} ms`;
         renderResponse(payload);
     } catch (err) {
         console.error(err);
-        responseMeta.textContent = `${method} ${path} failed`;
+        responseMeta.textContent = `${method} ${buildApiUrl(path)} failed`;
         renderResponse({ error: "Request failed", detail: String(err.message || err) });
     }
 }
@@ -1020,12 +1022,25 @@ function updateStudiosCreatorsMeta(reason, filteredStudios, totalStudios, filter
 }
 
 async function fetchJson(url) {
-    const response = await fetch(url);
+    const response = await fetch(buildApiUrl(url));
     if (!response.ok) {
         throw new Error(`Request failed for ${url} with status ${response.status}`);
     }
 
     return response.json();
+}
+
+function buildApiUrl(url) {
+    const value = String(url || "").trim();
+    if (/^https?:\/\//i.test(value)) {
+        return value;
+    }
+
+    if (value.startsWith("/")) {
+        return `${API_SERVER_ORIGIN}${value}`;
+    }
+
+    return `${API_SERVER_ORIGIN}/${value}`;
 }
 
 function getEraLabelFromYear(year) {
