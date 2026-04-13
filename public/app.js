@@ -44,6 +44,30 @@ async function initializePortal() {
         refreshAnimeData("Initial load"),
         refreshStudiosCreatorsData("Initial load"),
     ]);
+
+    verifyCreateEndpoint();
+}
+
+async function verifyCreateEndpoint() {
+    try {
+        const routes = await fetchJson(`${API_BASE}/routes`);
+        const hasCreateEndpoint = Array.isArray(routes.routes) && 
+            routes.routes.some(r => r.method === "POST" && r.path === "/api/anime");
+        
+        if (!hasCreateEndpoint) {
+            console.warn("POST /api/anime endpoint not found in available routes");
+            const addAnimaMeta = document.getElementById("addAnimeMeta");
+            if (addAnimaMeta) {
+                addAnimaMeta.innerHTML = `<strong style="color: var(--color-error, #d32f2f);">Error:</strong> Could not locate a working create endpoint on the backend. Available routes may not include POST /api/anime.`;
+            }
+        }
+    } catch (err) {
+        console.error("Failed to verify create endpoint:", err);
+        const addAnimaMeta = document.getElementById("addAnimeMeta");
+        if (addAnimaMeta) {
+            addAnimaMeta.innerHTML = `<strong style="color: var(--color-error, #d32f2f);">Error:</strong> Could not reach backend to verify create endpoint availability.`;
+        }
+    }
 }
 
 function bindEvents() {
@@ -99,6 +123,30 @@ function bindEvents() {
                 searchInput.value = "";
             }
             await refreshStudiosCreatorsData("Studios/creators search cleared");
+        });
+    }
+
+    const addAnimeForm = document.getElementById("addAnimeForm");
+    const clearAddAnimeBtn = document.getElementById("clearAddAnimeBtn");
+    const addAnimeYearInput = document.getElementById("addAnimeYear");
+
+    if (addAnimeYearInput) {
+        addAnimeYearInput.max = String(new Date().getFullYear() + 1);
+    }
+
+    if (addAnimeForm) {
+        addAnimeForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            await submitAddAnimeForm();
+        });
+    }
+
+    if (clearAddAnimeBtn) {
+        clearAddAnimeBtn.addEventListener("click", () => {
+            addAnimeForm.reset();
+            const responseDiv = document.getElementById("addAnimeResponse");
+            responseDiv.style.display = "none";
+            document.getElementById("addAnimeMeta").textContent = "Fill all fields to add a new anime record. Required fields marked with *.";
         });
     }
 
@@ -978,6 +1026,128 @@ async function fetchJson(url) {
     }
 
     return response.json();
+}
+
+function getEraLabelFromYear(year) {
+    if (year >= 2020) {
+        return "2020s";
+    }
+
+    if (year >= 2010) {
+        return "2010s";
+    }
+
+    if (year >= 2000) {
+        return "2000s";
+    }
+
+    if (year >= 1990) {
+        return "1990s";
+    }
+
+    return "1980s";
+}
+
+async function submitAddAnimeForm() {
+    const form = document.getElementById("addAnimeForm");
+    const responseDiv = document.getElementById("addAnimeResponse");
+    const metaDiv = document.getElementById("addAnimeMeta");
+
+    // Validate HTML5 constraints first
+    if (!form.checkValidity()) {
+        metaDiv.textContent = "Please fill all required fields with valid values.";
+        metaDiv.style.color = "var(--color-error, #d32f2f)";
+        return;
+    }
+
+    const createYearMax = new Date().getFullYear() + 1;
+
+    // Collect form data
+    const payload = {
+        title: document.getElementById("addAnimeTitle").value.trim(),
+        img_name: document.getElementById("addAnimeImgName").value.trim(),
+        year: Number(document.getElementById("addAnimeYear").value),
+        genre: document.getElementById("addAnimeGenre").value.trim(),
+        synopsis: document.getElementById("addAnimeSynopsis").value.trim(),
+        studio: document.getElementById("addAnimeStudio").value.trim(),
+        episodes: Number(document.getElementById("addAnimeEpisodes").value),
+        era: getEraLabelFromYear(Number(document.getElementById("addAnimeYear").value)),
+    };
+
+    // Client-side validation mirrors server-side Joi schema
+    const validationErrors = [];
+    
+    if (!payload.title || payload.title.length < 2 || payload.title.length > 120) {
+        validationErrors.push("Title must be 2-120 characters");
+    }
+    if (!payload.img_name || payload.img_name.length < 6 || payload.img_name.length > 512) {
+        validationErrors.push("Image path must be 6-512 characters");
+    } else if (!/^(https?:\/\/[^\s]+|images\/[A-Za-z0-9_./-]+)$/i.test(payload.img_name)) {
+        validationErrors.push("Use a full URL or a relative path like images/your-poster.webp");
+    }
+    if (!payload.year || payload.year < 1960 || payload.year > createYearMax) {
+        validationErrors.push(`Year must be between 1960 and ${createYearMax}`);
+    }
+    if (!payload.genre || payload.genre.length < 2 || payload.genre.length > 80) {
+        validationErrors.push("Genre must be 2-80 characters");
+    }
+    if (!payload.synopsis || payload.synopsis.length < 20 || payload.synopsis.length > 1200) {
+        validationErrors.push("Synopsis must be 20-1200 characters");
+    }
+    if (!payload.studio || payload.studio.length < 2 || payload.studio.length > 90) {
+        validationErrors.push("Studio must be 2-90 characters");
+    }
+    if (!payload.episodes || payload.episodes < 1 || payload.episodes > 2500) {
+        validationErrors.push("Episodes must be between 1 and 2500");
+    }
+
+    if (validationErrors.length > 0) {
+        metaDiv.innerHTML = `<strong>Validation Errors:</strong><ul style="margin-top: 0.5rem;"><li>${validationErrors.join("</li><li>")}</li></ul>`;
+        metaDiv.style.color = "var(--color-error, #d32f2f)";
+        return;
+    }
+
+    try {
+        metaDiv.textContent = "Submitting...";
+        responseDiv.style.display = "none";
+
+        const response = await fetch(`${API_BASE}/anime`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            const errorMsg = data.error || "Unknown error";
+            const details = data.details && Array.isArray(data.details) ? data.details.join(", ") : "";
+            const fullMsg = details ? `${errorMsg}: ${details}` : errorMsg;
+            
+            metaDiv.innerHTML = `<strong style="color: var(--color-error, #d32f2f);">Error:</strong> ${escapeHtml(fullMsg)}`;
+            responseDiv.innerHTML = `<pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>`;
+            responseDiv.style.display = "block";
+            return;
+        }
+
+        // Success
+        metaDiv.innerHTML = `<strong style="color: var(--color-success, #388e3c);">Success!</strong> New anime added with ID: ${data.data._id}`;
+        responseDiv.innerHTML = `<pre>${escapeHtml(JSON.stringify(data.data, null, 2))}</pre>`;
+        responseDiv.style.display = "block";
+        
+        // Clear the form
+        form.reset();
+        
+        // Refresh the anime list to show the new entry
+        await refreshAnimeData("New anime added via POST /api/anime");
+    } catch (err) {
+        console.error("Error adding anime:", err);
+        const errorMsg = err.message || "Unknown error occurred";
+        const fullErrorMsg = `${errorMsg}. Please ensure the backend server is running and /api/anime endpoint is accessible.`;
+        metaDiv.innerHTML = `<strong style="color: var(--color-error, #d32f2f);">Error:</strong> ${escapeHtml(fullErrorMsg)}`;
+    }
 }
 
 function escapeHtml(value) {

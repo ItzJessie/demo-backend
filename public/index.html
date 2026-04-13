@@ -138,6 +138,132 @@
                 </p>
             </section>
 
+            <section class="panel reveal" aria-labelledby="add-anime-heading">
+                <div class="panel-header">
+                    <h2 id="add-anime-heading">
+                        Add New Anime (POST /api/anime)
+                    </h2>
+                    <span class="panel-tag">Joi-validated form submission</span>
+                </div>
+                <form id="addAnimeForm" class="filter-grid">
+                    <label class="field-wrap span-2">
+                        Title *
+                        <input
+                            id="addAnimeTitle"
+                            type="text"
+                            name="title"
+                            required
+                            minlength="2"
+                            maxlength="120"
+                            placeholder="e.g., Fullmetal Alchemist"
+                            aria-label="Anime title"
+                        />
+                    </label>
+                    <label class="field-wrap span-2">
+                        Image Name/Path *
+                        <input
+                            id="addAnimeImgName"
+                            type="text"
+                            name="img_name"
+                            required
+                            minlength="6"
+                            maxlength="512"
+                            pattern="(https?://[^\s]+|images/[A-Za-z0-9_./-]+)"
+                            placeholder="e.g., images/versions/anime/title-slug/image.jpg"
+                            aria-label="Image path"
+                        />
+                    </label>
+                    <label class="field-wrap">
+                        Year *
+                        <input
+                            id="addAnimeYear"
+                            type="number"
+                            name="year"
+                            required
+                            min="1960"
+                            max="2100"
+                            step="1"
+                            placeholder="2025"
+                            aria-label="Release year"
+                        />
+                    </label>
+                    <label class="field-wrap span-2">
+                        Genre *
+                        <input
+                            id="addAnimeGenre"
+                            type="text"
+                            name="genre"
+                            required
+                            minlength="2"
+                            maxlength="80"
+                            placeholder="e.g., Action, Adventure, Dark Fantasy"
+                            aria-label="Genre"
+                        />
+                    </label>
+                    <label class="field-wrap span-2">
+                        Synopsis *
+                        <textarea
+                            id="addAnimeSynopsis"
+                            name="synopsis"
+                            required
+                            minlength="20"
+                            maxlength="1200"
+                            rows="3"
+                            placeholder="Brief description of the anime..."
+                            aria-label="Synopsis"
+                        ></textarea>
+                    </label>
+                    <label class="field-wrap">
+                        Studio *
+                        <input
+                            id="addAnimeStudio"
+                            type="text"
+                            name="studio"
+                            required
+                            minlength="2"
+                            maxlength="90"
+                            placeholder="e.g., Bones"
+                            aria-label="Studio"
+                        />
+                    </label>
+                    <label class="field-wrap">
+                        Episodes *
+                        <input
+                            id="addAnimeEpisodes"
+                            type="number"
+                            name="episodes"
+                            required
+                            min="1"
+                            max="2500"
+                            step="1"
+                            placeholder="12"
+                            aria-label="Episode count"
+                        />
+                    </label>
+                    <div class="filter-actions span-2">
+                        <button type="submit" class="action-btn primary">
+                            Add Anime
+                        </button>
+                        <button
+                            id="clearAddAnimeBtn"
+                            type="button"
+                            class="action-btn ghost"
+                        >
+                            Clear Form
+                        </button>
+                    </div>
+                </form>
+                <p id="addAnimeMeta" class="state-note compact">
+                    Fill all fields to add a new anime record. Required fields
+                    marked with *.
+                </p>
+                <div
+                    id="addAnimeResponse"
+                    class="response-viewer"
+                    style="display: none"
+                ></div>
+            </section>
+
             <section class="panel reveal" aria-labelledby="api-heading">
                 <div class="panel-header">
                     <h2 id="api-heading">Available API Requests</h2>
