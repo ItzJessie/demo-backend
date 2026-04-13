@@ -1,10 +1,13 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("fs/promises");
+const path = require("path");
 
 const { startServer } = require("../app");
 
 let server;
 let baseUrl;
+const uploadedTestFiles = [];
 
 test.before(async () => {
   server = startServer(0);
@@ -14,6 +17,16 @@ test.before(async () => {
 });
 
 test.after(async () => {
+  await Promise.all(
+    uploadedTestFiles.map(async (filePath) => {
+      try {
+        await fs.unlink(filePath);
+      } catch (_err) {
+        // ignore cleanup failures for already-deleted files
+      }
+    })
+  );
+
   if (!server) {
     return;
   }
@@ -48,6 +61,17 @@ test("GET /api/anime returns data", async () => {
   assert.equal(typeof data[0]._id, "number");
 });
 
+test("GET /get returns CORS headers for deployed frontend origin", async () => {
+  const response = await fetch(`${baseUrl}/get`, {
+    headers: {
+      Origin: "https://itzjessie.github.io",
+    },
+  });
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("access-control-allow-origin"), "https://itzjessie.github.io");
+});
+
 test("GET /api/studios-creators returns arrays", async () => {
   const response = await fetch(`${baseUrl}/api/studios-creators`);
   assert.equal(response.status, 200);
@@ -60,6 +84,200 @@ test("GET /api/studios-creators returns arrays", async () => {
 test("GET /api/anime/:id returns 404 for missing record", async () => {
   const response = await fetch(`${baseUrl}/api/anime/999999`);
   assert.equal(response.status, 404);
+});
+
+test("POST /api/anime validates required fields", async () => {
+  const response = await fetch(`${baseUrl}/api/anime`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ title: "New Anime" }),
+  });
+
+  assert.equal(response.status, 400);
+
+  const data = await response.json();
+  assert.equal(data.success, false);
+  assert.equal(data.error, "Validation failed");
+  assert.ok(Array.isArray(data.details));
+  assert.ok(data.details.length > 0);
+});
+
+test("POST /api/anime adds a new anime record", async () => {
+  const payload = {
+    title: "Test Anime",
+    img_name: "images/versions/anime/test-anime/test-anime-v0001.jpg",
+    year: 2026,
+    genre: "Action",
+    synopsis: "A test-only anime created by integration tests and long enough for validation.",
+    studio: "Test Studio",
+    episodes: 12,
+  };
+
+  const response = await fetch(`${baseUrl}/api/anime`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  assert.equal(response.status, 201);
+
+  const data = await response.json();
+  assert.equal(data.success, true);
+  assert.equal(data.data.title, payload.title);
+  assert.equal(data.data.era, "2020s");
+  assert.equal(typeof data.data.slug, "string");
+  assert.equal(typeof data.data._id, "number");
+
+  const fetchCreated = await fetch(`${baseUrl}/api/anime/${data.data._id}`);
+  assert.equal(fetchCreated.status, 200);
+});
+
+test("POST /api/anime rejects invalid payload constraints", async () => {
+  const payload = {
+    title: "T",
+    img_name: "bad-path",
+    year: 2026,
+    genre: "Action",
+    synopsis: "Too short",
+    studio: "Test Studio",
+    episodes: 12,
+  };
+
+  const response = await fetch(`${baseUrl}/api/anime`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  assert.equal(response.status, 400);
+
+  const data = await response.json();
+  assert.equal(data.success, false);
+  assert.equal(data.error, "Validation failed");
+});
+
+test("POST /add creates anime using React create alias", async () => {
+  const payload = {
+    title: "Test Create Alias",
+    img_name: "images/versions/anime/test-uppercase/image.jpg",
+    year: 2026,
+    genre: "Action",
+    synopsis: "Testing create aliases that React uses for backend create requests.",
+    studio: "Test Studio",
+    episodes: 12,
+  };
+
+  const response = await fetch(`${baseUrl}/add`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  assert.equal(response.status, 201);
+
+  const data = await response.json();
+  assert.equal(data.success, true);
+  assert.equal(data.data.title, payload.title);
+  assert.equal(typeof data.data.slug, "string");
+});
+
+test("POST /post creates anime using compatibility alias", async () => {
+  const payload = {
+    title: "Test Post Alias",
+    img_name: "images/versions/anime/test-post-alias/image.jpg",
+    year: 2026,
+    genre: "Action",
+    synopsis: "Testing the /post compatibility alias for anime creation.",
+    studio: "Test Studio",
+    episodes: 12,
+  };
+
+  const response = await fetch(`${baseUrl}/post`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  assert.equal(response.status, 201);
+
+  const data = await response.json();
+  assert.equal(data.success, true);
+  assert.equal(data.data.title, payload.title);
+  assert.equal(typeof data.data.slug, "string");
+});
+
+test("POST /create alias is reachable", async () => {
+  const response = await fetch(`${baseUrl}/create`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ title: "x" }),
+  });
+
+  assert.equal(response.status, 400);
+});
+
+test("POST /new alias is reachable", async () => {
+  const response = await fetch(`${baseUrl}/new`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ title: "x" }),
+  });
+
+  assert.equal(response.status, 400);
+});
+
+test("POST /api/upload-image uploads an image", async () => {
+  const formData = new FormData();
+  formData.append("image", new Blob(["fake-image-content"], { type: "image/png" }), "test-upload.png");
+
+  const response = await fetch(`${baseUrl}/api/upload-image`, {
+    method: "POST",
+    body: formData,
+  });
+
+  assert.equal(response.status, 201);
+
+  const data = await response.json();
+  assert.equal(data.success, true);
+  assert.equal(data.message, "Image uploaded successfully");
+  assert.equal(data.file.mimetype, "image/png");
+  assert.match(data.file.path, /^images\/uploads\//);
+
+  const uploadedPath = path.join(__dirname, "..", "public", data.file.path);
+  uploadedTestFiles.push(uploadedPath);
+
+  const servedResponse = await fetch(`${baseUrl}/${data.file.path}`);
+  assert.equal(servedResponse.status, 200);
+});
+
+test("POST /api/upload-image returns 400 when no file is provided", async () => {
+  const response = await fetch(`${baseUrl}/api/upload-image`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
+  });
+
+  assert.equal(response.status, 400);
+
+  const data = await response.json();
+  assert.equal(data.success, false);
+  assert.equal(data.error, "No image file uploaded");
 });
 
 test("POST /api/feedback validates required fields", async () => {

@@ -1,8 +1,11 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const fsSync = require("fs");
 const fs = require("fs/promises");
 const { MongoClient } = require("mongodb");
+const Joi = require("joi");
+const multer = require("multer");
 
 require("dotenv").config();
 
@@ -10,15 +13,121 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3001;
 const FEEDBACK_DIR = path.join(__dirname, "feedbacks");
 const ANIME_FILE = path.join(__dirname, "data", "animeSeries.json");
+const UPLOADS_DIR = path.join(__dirname, "public", "images", "uploads");
 const STUDIOS_CREATORS_FILE =
   process.env.STUDIOS_CREATORS_FILE || path.join(__dirname, "data", "studiosCreators.json");
 
 const MONGODB_URI = process.env.MONGODB_URI;
 const MONGODB_DB = process.env.MONGODB_DB || "anime_archive";
 const MONGODB_COLLECTION = process.env.MONGODB_COLLECTION || "feedbacks";
+const MAX_CREATE_YEAR = new Date().getFullYear() + 1;
+
+function normalizeOrigin(value) {
+  return String(value || "")
+    .trim()
+    .replace(/\/+$/, "")
+    .toLowerCase();
+}
+
+const FRONTEND_ORIGINS = new Set([
+  normalizeOrigin("https://itzjessie.github.io"),
+  normalizeOrigin("https://www.itzjessie.github.io"),
+  normalizeOrigin("http://localhost:3000"),
+  normalizeOrigin("http://localhost:5173"),
+]);
+
+if (process.env.FRONTEND_ORIGIN) {
+  FRONTEND_ORIGINS.add(normalizeOrigin(process.env.FRONTEND_ORIGIN));
+}
+
+if (process.env.FRONTEND_ORIGINS) {
+  process.env.FRONTEND_ORIGINS.split(",")
+    .map((origin) => normalizeOrigin(origin))
+    .filter(Boolean)
+    .forEach((origin) => FRONTEND_ORIGINS.add(origin));
+}
+
+fsSync.mkdirSync(UPLOADS_DIR, { recursive: true });
 
 let mongoClient;
 let mongoCollection;
+let animeListCache = null;
+
+const uploadStorage = multer.diskStorage({
+  destination: (_req, _file, cb) => {
+    cb(null, UPLOADS_DIR);
+  },
+  filename: (_req, file, cb) => {
+    const originalName = String(file.originalname || "upload").toLowerCase();
+    const extension = path.extname(originalName) || ".jpg";
+    const baseName = path
+      .basename(originalName, extension)
+      .replace(/[^a-z0-9_-]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 80);
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e6)}`;
+    cb(null, `${baseName || "image"}-${uniqueSuffix}${extension}`);
+  },
+});
+
+const uploadImage = multer({
+  storage: uploadStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+  fileFilter: (_req, file, cb) => {
+    if (String(file.mimetype || "").startsWith("image/")) {
+      cb(null, true);
+      return;
+    }
+
+    cb(new Error("Only image files are allowed"));
+  },
+});
+
+const animeCreateSchema = Joi.object({
+  title: Joi.string().trim().min(2).max(120).required(),
+  img_name: Joi.string()
+    .trim()
+    .min(6)
+    .max(512)
+    .pattern(/^(https?:\/\/[^\s]+|images\/[A-Za-z0-9_./-]+)$/i)
+    .required(),
+  year: Joi.number().integer().min(1960).max(MAX_CREATE_YEAR).required(),
+  era: Joi.string().trim().valid("1980s", "1990s", "2000s", "2010s", "2020s").optional(),
+  genre: Joi.string().trim().min(2).max(80).required(),
+  synopsis: Joi.string().trim().min(20).max(1200).required(),
+  studio: Joi.string().trim().min(2).max(90).required(),
+  episodes: Joi.number().integer().min(1).max(2500).required(),
+  slug: Joi.string().trim().lowercase().pattern(/^[a-z0-9\-]+$/).min(1).max(200).optional(),
+});
+
+function getEraLabel(year) {
+  if (year >= 2020) {
+    return "2020s";
+  }
+  if (year >= 2010) {
+    return "2010s";
+  }
+  if (year >= 2000) {
+    return "2000s";
+  }
+  if (year >= 1990) {
+    return "1990s";
+  }
+  return "1980s";
+}
+
+function toSlug(title) {
+  return String(title || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
 
 async function ensureMongoCollection() {
   if (!MONGODB_URI) {
@@ -72,6 +181,14 @@ async function loadAnimeList() {
   return parsed;
 }
 
+async function getAnimeList() {
+  if (!animeListCache) {
+    animeListCache = await loadAnimeList();
+  }
+
+  return animeListCache;
+}
+
 async function loadStudiosCreators() {
   const raw = await fs.readFile(STUDIOS_CREATORS_FILE, "utf8");
   const parsed = JSON.parse(raw);
@@ -87,18 +204,44 @@ async function loadStudiosCreators() {
   return parsed;
 }
 
-app.use(cors());
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+
+    if (FRONTEND_ORIGINS.has(normalizeOrigin(origin))) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error("Origin not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+};
+
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/api/anime", async (_req, res) => {
+async function handleAnimeRequest(_req, res) {
   try {
-    const animeList = await loadAnimeList();
+    const animeList = await getAnimeList();
     res.json(animeList);
   } catch (err) {
     console.error("Error loading anime data", err);
     res.status(500).json({ error: "Failed to load anime records" });
   }
+}
+
+app.get("/api/anime", async (_req, res) => {
+  await handleAnimeRequest(_req, res);
+});
+
+app.get("/get", async (_req, res) => {
+  await handleAnimeRequest(_req, res);
 });
 
 app.get("/api/studios-creators", async (_req, res) => {
@@ -123,6 +266,11 @@ app.get("/api/routes", (_req, res) => {
       },
       {
         method: "GET",
+        path: "/get",
+        description: "Alias for getting all anime records",
+      },
+      {
+        method: "GET",
         path: "/api/studios-creators",
         description: "Get studios and creators records",
       },
@@ -130,6 +278,36 @@ app.get("/api/routes", (_req, res) => {
         method: "GET",
         path: "/api/anime/:id",
         description: "Get a single anime by numeric id",
+      },
+      {
+        method: "POST",
+        path: "/api/anime",
+        description: "Validate and add a new anime record",
+      },
+      {
+        method: "POST",
+        path: "/api/upload-image",
+        description: "Upload an image file and store it under public/images/uploads",
+      },
+      {
+        method: "POST",
+        path: "/add",
+        description: "Create alias for anime record insert",
+      },
+      {
+        method: "POST",
+        path: "/post",
+        description: "Create alias for anime record insert",
+      },
+      {
+        method: "POST",
+        path: "/create",
+        description: "Create alias for anime record insert",
+      },
+      {
+        method: "POST",
+        path: "/new",
+        description: "Create alias for anime record insert",
       },
       {
         method: "POST",
@@ -157,7 +335,7 @@ app.get("/api/routes", (_req, res) => {
 
 app.get("/api/anime/:id", async (req, res) => {
   try {
-    const animeList = await loadAnimeList();
+    const animeList = await getAnimeList();
     const id = Number(req.params.id);
     const anime = animeList.find((item) => item._id === id);
 
@@ -170,6 +348,105 @@ app.get("/api/anime/:id", async (req, res) => {
     console.error("Error loading anime data", err);
     return res.status(500).json({ error: "Failed to load anime records" });
   }
+});
+
+async function handleAnimeCreate(req, res) {
+  const { error, value } = animeCreateSchema.validate(req.body || {}, {
+    abortEarly: false,
+    stripUnknown: true,
+  });
+
+  if (error) {
+    return res.status(400).json({
+      success: false,
+      error: "Validation failed",
+      details: error.details.map((item) => item.message),
+    });
+  }
+
+  try {
+    const animeList = await getAnimeList();
+    const resolvedSlug = value.slug || `${toSlug(value.title)}-${value.year}`;
+    const resolvedEra = value.era || getEraLabel(value.year);
+
+    const duplicate = animeList.some(
+      (item) =>
+        String(item.slug || "").toLowerCase() === resolvedSlug.toLowerCase() ||
+        (String(item.title || "").toLowerCase() === String(value.title).toLowerCase() &&
+          Number(item.year) === Number(value.year))
+    );
+
+    if (duplicate) {
+      return res.status(409).json({
+        success: false,
+        error: "Anime record already exists",
+      });
+    }
+
+    const nextId = animeList.reduce((maxId, item) => {
+      const currentId = Number(item._id) || 0;
+      return currentId > maxId ? currentId : maxId;
+    }, 0) + 1;
+
+    const newAnime = {
+      _id: nextId,
+      ...value,
+      era: resolvedEra,
+      slug: resolvedSlug,
+    };
+
+    animeList.push(newAnime);
+
+    return res.status(201).json({
+      success: true,
+      message: "Anime added successfully",
+      data: newAnime,
+    });
+  } catch (err) {
+    console.error("Error adding anime", err);
+    return res.status(500).json({
+      success: false,
+      error: "Failed to add anime record",
+    });
+  }
+}
+
+app.post("/api/anime", handleAnimeCreate);
+app.post("/add", handleAnimeCreate);
+app.post("/post", handleAnimeCreate);
+app.post("/create", handleAnimeCreate);
+app.post("/new", handleAnimeCreate);
+
+app.post("/api/upload-image", (req, res) => {
+  uploadImage.single("image")(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      return res.status(400).json({
+        success: false,
+        error: err.code === "LIMIT_FILE_SIZE" ? "Image must be 5MB or less" : err.message,
+      });
+    }
+
+    if (err) {
+      return res.status(400).json({ success: false, error: err.message });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: "No image file uploaded" });
+    }
+
+    const storedPath = `images/uploads/${req.file.filename}`;
+    return res.status(201).json({
+      success: true,
+      message: "Image uploaded successfully",
+      file: {
+        filename: req.file.filename,
+        path: storedPath,
+        url: `/${storedPath}`,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+      },
+    });
+  });
 });
 
 app.post("/api/feedback", async (req, res) => {
