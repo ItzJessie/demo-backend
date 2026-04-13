@@ -134,7 +134,8 @@ async function submitAnimeWithFallback(payload) {
     return {
         response: { ok: false, status: lastStatus || 404 },
         data: lastData,
-        usedPath: prioritizedPaths[prioritizedPaths.length - 1] || state.createEndpointPath,
+        usedPath: prioritizedPaths[0] || state.createEndpointPath,
+        triedPaths: prioritizedPaths,
     };
 }
 
@@ -1193,14 +1194,17 @@ async function submitAddAnimeForm() {
         metaDiv.textContent = "Submitting...";
         responseDiv.style.display = "none";
 
-        const { response, data, usedPath } = await submitAnimeWithFallback(payload);
+        const { response, data, usedPath, triedPaths } = await submitAnimeWithFallback(payload);
 
         if (!response.ok) {
             const errorMsg = data.error || "Unknown error";
             const details = data.details && Array.isArray(data.details) ? data.details.join(", ") : "";
             const fullMsg = details ? `${errorMsg}: ${details}` : errorMsg;
             
-            metaDiv.innerHTML = `<strong style="color: var(--color-error, #d32f2f);">Error:</strong> ${escapeHtml(fullMsg)} (endpoint: ${escapeHtml(usedPath)})`;
+            const triedText = Array.isArray(triedPaths) && triedPaths.length
+                ? ` Tried: ${escapeHtml(triedPaths.join(", "))}.`
+                : "";
+            metaDiv.innerHTML = `<strong style="color: var(--color-error, #d32f2f);">Error:</strong> ${escapeHtml(fullMsg)} (primary endpoint: ${escapeHtml(usedPath)}).${triedText}`;
             responseDiv.innerHTML = `<pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>`;
             responseDiv.style.display = "block";
             return;
