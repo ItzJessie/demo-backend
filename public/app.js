@@ -1,5 +1,6 @@
 const API_SERVER_ORIGIN = "https://demo-backend-1-0t5d.onrender.com";
 const API_BASE = `${API_SERVER_ORIGIN}/api`;
+const CREATE_ENDPOINT_CANDIDATES = ["/api/anime", "/post", "/add", "/create", "/new"];
 const THEME_STORAGE_KEY = "animePortalTheme";
 const MOBILE_SECTION_STORAGE_KEY = "animePortalMobileSection";
 const MOBILE_SECTION_QUERY = "(max-width: 640px)";
@@ -14,6 +15,8 @@ const state = {
     filteredStudios: [],
     filteredCreators: [],
     routes: [],
+    createEndpointPath: "/api/anime",
+    availableCreatePaths: ["/api/anime"],
     collapsedGridState: {
         anime: true,
         studios: true,
@@ -45,30 +48,94 @@ async function initializePortal() {
         refreshAnimeData("Initial load"),
         refreshStudiosCreatorsData("Initial load"),
     ]);
-
-    verifyCreateEndpoint();
+    await verifyCreateEndpoint();
 }
 
 async function verifyCreateEndpoint() {
     try {
         const routes = await fetchJson(`${API_BASE}/routes`);
-        const hasCreateEndpoint = Array.isArray(routes.routes) && 
-            routes.routes.some(r => r.method === "POST" && r.path === "/api/anime");
-        
-        if (!hasCreateEndpoint) {
-            console.warn("POST /api/anime endpoint not found in available routes");
-            const addAnimaMeta = document.getElementById("addAnimeMeta");
-            if (addAnimaMeta) {
-                addAnimaMeta.innerHTML = `<strong style="color: var(--color-error, #d32f2f);">Error:</strong> Could not locate a working create endpoint on the backend. Available routes may not include POST /api/anime.`;
-            }
+        const routeList = Array.isArray(routes.routes) ? routes.routes : [];
+        const availableCreatePaths = CREATE_ENDPOINT_CANDIDATES.filter((candidatePath) =>
+            routeList.some((route) => route.method === "POST" && route.path === candidatePath)
+        );
+
+        if (availableCreatePaths.length > 0) {
+            state.availableCreatePaths = availableCreatePaths;
+            state.createEndpointPath = availableCreatePaths[0];
+            return;
+        }
+
+        console.warn("No supported create endpoint found in available routes", routeList);
+        state.availableCreatePaths = [...CREATE_ENDPOINT_CANDIDATES];
+        state.createEndpointPath = CREATE_ENDPOINT_CANDIDATES[0];
+
+        const addAnimeMeta = document.getElementById("addAnimeMeta");
+        if (addAnimeMeta) {
+            addAnimeMeta.innerHTML = `<strong style="color: var(--color-error, #d32f2f);">Error:</strong> Could not locate a working create endpoint on the backend. Expected one of: ${escapeHtml(CREATE_ENDPOINT_CANDIDATES.join(", "))}.`;
         }
     } catch (err) {
         console.error("Failed to verify create endpoint:", err);
-        const addAnimaMeta = document.getElementById("addAnimeMeta");
-        if (addAnimaMeta) {
-            addAnimaMeta.innerHTML = `<strong style="color: var(--color-error, #d32f2f);">Error:</strong> Could not reach backend to verify create endpoint availability.`;
+        state.availableCreatePaths = [...CREATE_ENDPOINT_CANDIDATES];
+        state.createEndpointPath = CREATE_ENDPOINT_CANDIDATES[0];
+
+        const addAnimeMeta = document.getElementById("addAnimeMeta");
+        if (addAnimeMeta) {
+            addAnimeMeta.innerHTML = `<strong style="color: var(--color-error, #d32f2f);">Error:</strong> Could not reach backend to verify create endpoint availability. Submission will still try: ${escapeHtml(CREATE_ENDPOINT_CANDIDATES.join(", "))}.`;
         }
     }
+}
+
+async function submitAnimeWithFallback(payload) {
+    const attemptedPaths = new Set();
+    const prioritizedPaths = [state.createEndpointPath, ...state.availableCreatePaths, ...CREATE_ENDPOINT_CANDIDATES]
+        .filter((path) => {
+            if (attemptedPaths.has(path)) {
+                return false;
+            }
+            attemptedPaths.add(path);
+            return true;
+        });
+
+    let lastData = { error: "No response from create endpoint" };
+    let lastStatus = 0;
+
+    for (const path of prioritizedPaths) {
+        const response = await fetch(buildApiUrl(path), {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        });
+
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (_err) {
+            data = { error: "Invalid or non-JSON response" };
+        }
+
+        if (response.ok) {
+            state.createEndpointPath = path;
+            if (!state.availableCreatePaths.includes(path)) {
+                state.availableCreatePaths = [path, ...state.availableCreatePaths];
+            }
+            return { response, data, usedPath: path };
+        }
+
+        lastStatus = response.status;
+        lastData = data;
+
+        if (response.status !== 404) {
+            return { response, data, usedPath: path };
+        }
+    }
+
+    return {
+        response: { ok: false, status: lastStatus || 404 },
+        data: lastData,
+        usedPath: prioritizedPaths[prioritizedPaths.length - 1] || state.createEndpointPath,
+    };
 }
 
 function bindEvents() {
@@ -1126,29 +1193,21 @@ async function submitAddAnimeForm() {
         metaDiv.textContent = "Submitting...";
         responseDiv.style.display = "none";
 
-        const response = await fetch(`${API_BASE}/anime`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-        });
-
-        const data = await response.json();
+        const { response, data, usedPath } = await submitAnimeWithFallback(payload);
 
         if (!response.ok) {
             const errorMsg = data.error || "Unknown error";
             const details = data.details && Array.isArray(data.details) ? data.details.join(", ") : "";
             const fullMsg = details ? `${errorMsg}: ${details}` : errorMsg;
             
-            metaDiv.innerHTML = `<strong style="color: var(--color-error, #d32f2f);">Error:</strong> ${escapeHtml(fullMsg)}`;
+            metaDiv.innerHTML = `<strong style="color: var(--color-error, #d32f2f);">Error:</strong> ${escapeHtml(fullMsg)} (endpoint: ${escapeHtml(usedPath)})`;
             responseDiv.innerHTML = `<pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>`;
             responseDiv.style.display = "block";
             return;
         }
 
         // Success
-        metaDiv.innerHTML = `<strong style="color: var(--color-success, #388e3c);">Success!</strong> New anime added with ID: ${data.data._id}`;
+        metaDiv.innerHTML = `<strong style="color: var(--color-success, #388e3c);">Success!</strong> New anime added with ID: ${data.data._id} via ${escapeHtml(usedPath)}`;
         responseDiv.innerHTML = `<pre>${escapeHtml(JSON.stringify(data.data, null, 2))}</pre>`;
         responseDiv.style.display = "block";
         
@@ -1156,11 +1215,11 @@ async function submitAddAnimeForm() {
         form.reset();
         
         // Refresh the anime list to show the new entry
-        await refreshAnimeData("New anime added via POST /api/anime");
+        await refreshAnimeData(`New anime added via POST ${usedPath}`);
     } catch (err) {
         console.error("Error adding anime:", err);
         const errorMsg = err.message || "Unknown error occurred";
-        const fullErrorMsg = `${errorMsg}. Please ensure the backend server is running and /api/anime endpoint is accessible.`;
+        const fullErrorMsg = `${errorMsg}. Please ensure the backend server is running and at least one create endpoint is accessible: ${CREATE_ENDPOINT_CANDIDATES.join(", ")}.`;
         metaDiv.innerHTML = `<strong style="color: var(--color-error, #d32f2f);">Error:</strong> ${escapeHtml(fullErrorMsg)}`;
     }
 }
