@@ -285,6 +285,16 @@ app.get("/api/routes", (_req, res) => {
         description: "Validate and add a new anime record",
       },
       {
+        method: "PUT",
+        path: "/api/anime/:id",
+        description: "Validate and update an existing anime record by numeric id",
+      },
+      {
+        method: "DELETE",
+        path: "/api/anime/:id",
+        description: "Delete an anime record by numeric id",
+      },
+      {
         method: "POST",
         path: "/api/upload-image",
         description: "Upload an image file and store it under public/images/uploads",
@@ -416,6 +426,140 @@ app.post("/add", handleAnimeCreate);
 app.post("/post", handleAnimeCreate);
 app.post("/create", handleAnimeCreate);
 app.post("/new", handleAnimeCreate);
+
+app.put("/api/anime/:id", (req, res) => {
+  uploadImage.single("image")(req, res, async (err) => {
+    if (err instanceof multer.MulterError) {
+      return res.status(400).json({
+        success: false,
+        error: err.code === "LIMIT_FILE_SIZE" ? "Image must be 5MB or less" : err.message,
+      });
+    }
+
+    if (err) {
+      return res.status(400).json({ success: false, error: err.message });
+    }
+
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid anime id",
+      });
+    }
+
+    const payload = {
+      ...(req.body || {}),
+    };
+
+    if (req.file) {
+      payload.img_name = `images/uploads/${req.file.filename}`;
+    }
+
+    const { error, value } = animeCreateSchema.validate(payload, {
+      abortEarly: false,
+      stripUnknown: true,
+    });
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        error: "Validation failed",
+        details: error.details.map((item) => item.message),
+      });
+    }
+
+    try {
+      const animeList = await getAnimeList();
+      const animeIndex = animeList.findIndex((item) => Number(item._id) === id);
+
+      if (animeIndex === -1) {
+        return res.status(404).json({
+          success: false,
+          error: "Anime not found",
+        });
+      }
+
+      const resolvedSlug = value.slug || `${toSlug(value.title)}-${value.year}`;
+      const resolvedEra = value.era || getEraLabel(value.year);
+
+      const duplicate = animeList.some(
+        (item, index) =>
+          index !== animeIndex &&
+          (String(item.slug || "").toLowerCase() === resolvedSlug.toLowerCase() ||
+            (String(item.title || "").toLowerCase() === String(value.title).toLowerCase() &&
+              Number(item.year) === Number(value.year)))
+      );
+
+      if (duplicate) {
+        return res.status(409).json({
+          success: false,
+          error: "Anime record already exists",
+        });
+      }
+
+      const existingAnime = animeList[animeIndex];
+      const updatedAnime = {
+        ...existingAnime,
+        ...value,
+        era: resolvedEra,
+        slug: resolvedSlug,
+        _id: existingAnime._id,
+      };
+
+      animeList[animeIndex] = updatedAnime;
+
+      return res.status(200).json({
+        success: true,
+        message: "Anime updated successfully",
+        data: updatedAnime,
+      });
+    } catch (updateErr) {
+      console.error("Error updating anime", updateErr);
+      return res.status(500).json({
+        success: false,
+        error: "Failed to update anime record",
+      });
+    }
+  });
+});
+
+app.delete("/api/anime/:id", async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({
+      success: false,
+      error: "Invalid anime id",
+    });
+  }
+
+  try {
+    const animeList = await getAnimeList();
+    const animeIndex = animeList.findIndex((item) => Number(item._id) === id);
+
+    if (animeIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        error: "Anime not found",
+      });
+    }
+
+    const deletedAnime = animeList[animeIndex];
+    animeList.splice(animeIndex, 1);
+
+    return res.json({
+      success: true,
+      message: "Anime deleted successfully",
+      data: deletedAnime,
+    });
+  } catch (err) {
+    console.error("Error deleting anime", err);
+    return res.status(500).json({
+      success: false,
+      error: "Failed to delete anime record",
+    });
+  }
+});
 
 app.post("/api/upload-image", (req, res) => {
   uploadImage.single("image")(req, res, (err) => {

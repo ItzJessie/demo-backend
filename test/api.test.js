@@ -162,6 +162,174 @@ test("POST /api/anime rejects invalid payload constraints", async () => {
   assert.equal(data.error, "Validation failed");
 });
 
+test("PUT /api/anime/:id validates required fields", async () => {
+  const response = await fetch(`${baseUrl}/api/anime/1`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ title: "Updated" }),
+  });
+
+  assert.equal(response.status, 400);
+
+  const data = await response.json();
+  assert.equal(data.success, false);
+  assert.equal(data.error, "Validation failed");
+  assert.ok(Array.isArray(data.details));
+  assert.ok(data.details.length > 0);
+});
+
+test("PUT /api/anime/:id updates an existing anime record", async () => {
+  const createPayload = {
+    title: "Put Target Anime",
+    img_name: "images/versions/anime/put-target-anime/image.jpg",
+    year: 2026,
+    genre: "Action",
+    synopsis: "This record is created to verify that the PUT endpoint updates an anime item.",
+    studio: "Test Studio",
+    episodes: 12,
+  };
+
+  const createResponse = await fetch(`${baseUrl}/api/anime`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(createPayload),
+  });
+
+  assert.equal(createResponse.status, 201);
+  const created = await createResponse.json();
+
+  const updatePayload = {
+    title: "Put Target Anime Updated",
+    img_name: "images/versions/anime/put-target-anime-updated/image.jpg",
+    year: 2025,
+    genre: "Sci-Fi",
+    synopsis: "This updated record verifies the API can find a record by id and replace editable fields.",
+    studio: "Update Studio",
+    episodes: 24,
+  };
+
+  const updateResponse = await fetch(`${baseUrl}/api/anime/${created.data._id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(updatePayload),
+  });
+
+  assert.equal(updateResponse.status, 200);
+
+  const updateData = await updateResponse.json();
+  assert.equal(updateData.success, true);
+  assert.equal(updateData.data._id, created.data._id);
+  assert.equal(updateData.data.title, updatePayload.title);
+  assert.equal(updateData.data.episodes, updatePayload.episodes);
+  assert.equal(updateData.data.era, "2020s");
+});
+
+test("PUT /api/anime/:id updates image when file is provided", async () => {
+  const createPayload = {
+    title: "Put With File Target",
+    img_name: "images/versions/anime/put-with-file-target/image.jpg",
+    year: 2026,
+    genre: "Action",
+    synopsis: "This record verifies multipart PUT updates and image path replacement.",
+    studio: "File Studio",
+    episodes: 11,
+  };
+
+  const createResponse = await fetch(`${baseUrl}/api/anime`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(createPayload),
+  });
+
+  assert.equal(createResponse.status, 201);
+  const created = await createResponse.json();
+
+  const formData = new FormData();
+  formData.append("title", "Put With File Updated");
+  formData.append("year", "2026");
+  formData.append("genre", "Adventure");
+  formData.append(
+    "synopsis",
+    "This updated record includes a multipart image upload and validates image replacement."
+  );
+  formData.append("studio", "File Studio Updated");
+  formData.append("episodes", "22");
+  formData.append("image", new Blob(["updated-image-content"], { type: "image/png" }), "updated-put.png");
+
+  const updateResponse = await fetch(`${baseUrl}/api/anime/${created.data._id}`, {
+    method: "PUT",
+    body: formData,
+  });
+
+  assert.equal(updateResponse.status, 200);
+
+  const updateData = await updateResponse.json();
+  assert.equal(updateData.success, true);
+  assert.equal(updateData.data._id, created.data._id);
+  assert.match(updateData.data.img_name, /^images\/uploads\//);
+
+  const uploadedPath = path.join(__dirname, "..", "public", updateData.data.img_name);
+  uploadedTestFiles.push(uploadedPath);
+
+  const servedResponse = await fetch(`${baseUrl}/${updateData.data.img_name}`);
+  assert.equal(servedResponse.status, 200);
+});
+
+test("DELETE /api/anime/:id deletes an existing anime record", async () => {
+  const createPayload = {
+    title: "Delete Target Anime",
+    img_name: "images/versions/anime/delete-target-anime/image.jpg",
+    year: 2026,
+    genre: "Action",
+    synopsis: "This record is created to verify that the DELETE endpoint removes an anime item.",
+    studio: "Delete Studio",
+    episodes: 13,
+  };
+
+  const createResponse = await fetch(`${baseUrl}/api/anime`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(createPayload),
+  });
+
+  assert.equal(createResponse.status, 201);
+  const created = await createResponse.json();
+
+  const deleteResponse = await fetch(`${baseUrl}/api/anime/${created.data._id}`, {
+    method: "DELETE",
+  });
+
+  assert.equal(deleteResponse.status, 200);
+  const deleteData = await deleteResponse.json();
+  assert.equal(deleteData.success, true);
+  assert.equal(deleteData.data._id, created.data._id);
+
+  const fetchDeleted = await fetch(`${baseUrl}/api/anime/${created.data._id}`);
+  assert.equal(fetchDeleted.status, 404);
+});
+
+test("DELETE /api/anime/:id returns 404 for missing record", async () => {
+  const response = await fetch(`${baseUrl}/api/anime/999999`, {
+    method: "DELETE",
+  });
+
+  assert.equal(response.status, 404);
+
+  const data = await response.json();
+  assert.equal(data.success, false);
+  assert.equal(data.error, "Anime not found");
+});
+
 test("POST /add creates anime using React create alias", async () => {
   const payload = {
     title: "Test Create Alias",
