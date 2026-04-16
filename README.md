@@ -1,375 +1,239 @@
-# 🎌 Anime Archive Backend API
+# Anime Archive Backend API
 
-A powerful backend server for the Anime Archive Timeline Website. This API serves extensive anime data and handles user feedback submissions with a beautifully themed anime interface.
+Express-based backend for the Anime Archive project. It serves the anime dataset, studio and creator metadata, feedback storage, image uploads, and a route catalog used by the tests and frontend.
 
-## 🚀 Features
+## Overview
 
-- **📺 Anime Data API**: Browse and search through 50+ popular anime series
-- **💬 Feedback Form**: Collect user feedback with ratings and comments
-- **🎨 Anime-Themed Interface**: Modern, dark-themed UI with anime aesthetics
-- **🔍 Search & Filter**: Search by title, genre, studio, or filter by era (1980s-2020s)
-- **✅ Persistent Storage**: All feedback is saved locally in JSON format
+The app starts from `index.js` and `server.js`, both of which load the shared server implementation in `app.js`. The server serves static files from `public/` and exposes JSON APIs under `/api`.
 
-## 📋 Prerequisites
+## Requirements
 
-- Node.js (v14+)
-- npm (v6+)
+- Node.js 18 or newer
+- npm
 
-## 🛠️ Installation
+## Install and run
 
-1. **Navigate to the project directory**
-```bash
-cd /Users/jessiejavanbrown/Desktop/DEMO-BACKEND2/demo-backend
-```
-
-2. **Install dependencies**
 ```bash
 npm install
+npm start
 ```
 
-3. **(Optional) Connect to MongoDB Atlas**
+By default the server listens on port `3001`. You can override it with `PORT`.
 
-Create a `.env` file in the project root and add:
+Expected startup output:
+
+```text
+Anime Archive Backend Server is running on http://localhost:3001
+```
+
+Open `http://localhost:3001` to load the static frontend from `public/index.html`.
+
+## Environment variables
+
+Create a `.env` file in the project root if you need to customize runtime behavior.
 
 ```env
+PORT=3001
+FRONTEND_ORIGIN=https://itzjessie.github.io
+FRONTEND_ORIGINS=https://itzjessie.github.io,https://www.itzjessie.github.io
+STUDIOS_CREATORS_FILE=/absolute/path/to/studiosCreators.json
 MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/?retryWrites=true&w=majority
 MONGODB_DB=anime_archive
 MONGODB_COLLECTION=feedbacks
 ```
 
-If `MONGODB_URI` is present, feedback is written to Atlas and appears in MongoDB Data Explorer.
+Notes:
 
-## 🎯 Getting Started
+- `FRONTEND_ORIGIN` and `FRONTEND_ORIGINS` extend the CORS allowlist.
+- If `MONGODB_URI` is set, feedback is also inserted into the configured MongoDB collection.
+- If `STUDIOS_CREATORS_FILE` is set, the studios/creators endpoint reads from that file instead of `data/studiosCreators.json`.
 
-### Start the Server
+## API
 
-```bash
-npm start
+### Health
+
+```http
+GET /api/health
 ```
 
-The server will start on **http://localhost:3001**
+Returns server status and whether MongoDB is configured.
 
-You should see:
-```
-🎌 Anime Archive Backend Server is up and running on port 3001
-```
+### Route catalog
 
-### Access the Interface
-
-Open your browser and navigate to:
-```
-http://localhost:3001
+```http
+GET /api/routes
 ```
 
-## 📡 API Endpoints
+Returns the list of available API routes.
 
-### 📺 Get All Anime Series
-```
+### Anime data
+
+```http
 GET /api/anime
+GET /get
 ```
 
-**Response**: Array of anime objects with all series data
+Returns the full anime list from `data/animeSeries.json`.
 
-**Example**:
-```bash
-curl http://localhost:3001/api/anime
-```
-
-### 🏢 Get Studios and Creators
-```
-GET /api/studios-creators
-```
-
-**Response**: JSON object with `studios` and `creators` arrays
-
-**Data source**: `data/studiosCreators.json` by default.
-
-Optional override in `.env`:
-
-```env
-STUDIOS_CREATORS_FILE=/absolute/path/to/studiosCreators.json
-```
-
-**Example**:
-```bash
-curl http://localhost:3001/api/studios-creators
-```
-
-### 🔍 Get Specific Anime by ID
-```
+```http
 GET /api/anime/:id
 ```
 
-**Parameters**:
-- `id` (number): Anime ID (1-10)
+Returns one anime record by numeric `_id`.
 
-**Response**: Single anime object
+Example:
 
-**Example**:
 ```bash
 curl http://localhost:3001/api/anime/1
 ```
 
-### 💬 Submit Feedback
-```
-POST /api/feedback
+### Create, update, delete anime
+
+```http
+POST /api/anime
+POST /add
+POST /post
+POST /create
+POST /new
+PUT /api/anime/:id
+DELETE /api/anime/:id
 ```
 
-**Request Body**:
-```json
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "phone": "(555) 123-4567",
-  "age": "25",
-  "satisfaction": "Great content and easy to navigate!",
-  "rating": 5,
-  "comments": "Would love to see more studios featured"
-}
-```
+Create and update requests are validated with Joi. Required fields are:
 
-**Response**:
-```json
-{
-  "message": "Feedback submitted successfully",
-  "id": "1774967773042"
-}
-```
+- `title`
+- `img_name`
+- `year`
+- `genre`
+- `synopsis`
+- `studio`
+- `episodes`
 
-**Example**:
+Optional fields:
+
+- `era`
+- `slug`
+
+Behavior:
+
+- `era` is auto-derived from `year` when omitted.
+- `slug` is auto-generated from `title` and `year` when omitted.
+- Duplicate title/year or duplicate slug records are rejected.
+- `PUT /api/anime/:id` accepts regular JSON or multipart form data with an `image` file field.
+- Uploaded images are stored under `public/images/uploads` and returned as `images/uploads/<filename>`.
+
+Example create request:
+
 ```bash
-curl -X POST http://localhost:3001/api/feedback \
+curl -X POST http://localhost:3001/api/anime \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Jane Smith",
-    "email": "jane@example.com",
-    "rating": 5,
-    "satisfaction": "Excellent website!",
-    "comments": "Very informative"
+    "title": "Test Anime",
+    "img_name": "images/versions/anime/test-anime/test-anime-v0001.jpg",
+    "year": 2026,
+    "genre": "Action",
+    "synopsis": "A test-only anime created for validation.",
+    "studio": "Test Studio",
+    "episodes": 12
   }'
 ```
 
-### 📋 Get All Feedback Submissions
+### Image upload
+
+```http
+POST /api/upload-image
 ```
+
+Uploads a single image file using multipart form data with the field name `image`.
+
+### Studios and creators
+
+```http
+GET /api/studios-creators
+```
+
+Returns the `studios` and `creators` arrays from the configured JSON file.
+
+### Feedback
+
+```http
+POST /api/feedback
 GET /api/feedback
 ```
 
-**Response**: Array of all submitted feedback
+Feedback requires `name`, `email`, and `satisfaction`. The server stores each submission locally in `feedbacks/feedback_<timestamp>.json` and, if MongoDB is configured, also inserts it into the configured Atlas collection.
 
-**Example**:
-```bash
-curl http://localhost:3001/api/feedback
+Example response:
+
+```json
+{
+  "message": "Feedback submitted successfully",
+  "id": "1774967773042",
+  "insertedToMongo": false,
+  "atlasLocation": null
+}
 ```
 
-## 🎨 Frontend Features
+## Data shape
 
-### Navigation Sections
+Anime records in `data/animeSeries.json` use this structure:
 
-1. **📺 Anime Series**
-   - View all anime with detailed information
-   - Search by title, genre, or studio
-   - Filter by era (1980s-2020s)
-   - Beautiful card layout with anime details
-
-2. **💬 Feedback Form**
-   - Name, email, phone, age fields
-   - Satisfaction rating (required)
-   - Star rating system (1-5 stars)
-   - Additional comments field
-   - Real-time success/error messages
-
-3. **📚 API Documentation**
-   - Complete endpoint documentation
-   - Example requests and responses
-   - Integration guide
-
-## 📊 Anime Data Structure
-
-Each anime object contains:
 ```json
 {
   "_id": 1,
   "title": "Fullmetal Alchemist",
-  "img_name": "images/full-metal-alchemist-500x750.jpg",
+  "img_name": "images/versions/anime/fullmetal-alchemist-1/fullmetal-alchemist-1-v0002.jpg",
   "year": 2003,
   "era": "2000s",
   "genre": "Action, Adventure, Dark Fantasy",
-  "synopsis": "Brothers search for redemption...",
+  "synopsis": "Brothers search for redemption after a failed human transmutation shatters their bodies.",
   "studio": "Bones",
-  "episodes": 51
+  "episodes": 51,
+  "slug": "fullmetal-alchemist-1"
 }
 ```
 
-## 🧪 Verify Anime Image Mapping
-
-Run this command to validate image usage and mapping quality:
+## Verification and tests
 
 ```bash
+npm test
 npm run verify:images
+npm run verify:routes
 ```
 
-What it checks:
+What these do:
 
-- Every anime record has an `img_name`
-- Every `img_name` points to an existing file in `public/images`
-- Duplicate image reuse across multiple anime records
-- Unreferenced files in `public/images`
-- Suspicious title-to-filename mismatches (heuristic keyword check)
+- `npm test` runs the Node test suite in `test/api.test.js`.
+- `npm run verify:images` checks anime image references against files in `public/images`.
+- `npm run verify:routes` validates the create-endpoint coverage used by the repo scripts.
 
-Tip: if your filenames are numeric or generic, this command helps you catch likely mismatches and review them manually.
+## Project structure
 
-## 🖼️ Sync Image Assets
-
-If you want to regenerate predictable image paths and download missing artwork from Wikipedia, run:
-
-```bash
-npm run sync:images
-```
-
-This script:
-
-- Saves anime images to `public/images/anime`
-- Saves studio logos to `public/images/studios`
-- Saves creator portraits to `public/images/creators`
-- Reuses existing files when possible
-- Logs missing image matches to `scripts/logs/image-sync-missing.json`
-- Adds a local `public/images/fallback.jpg` placeholder if one is missing
-
-The script also rewrites the JSON image references so the frontend can keep auto-loading from the stored paths.
-
-## 💾 Feedback Storage
-
-Feedback is always saved in the local `/feedbacks` directory as individual JSON files with the naming pattern:
-```
-feedback_[timestamp].json
-```
-
-Example feedback file:
-```json
-{
-  "id": "1774967773042",
-  "name": "Test User",
-  "email": "test@example.com",
-  "phone": "(555) 123-4567",
-  "age": "25",
-  "satisfaction": "Great backend!",
-  "rating": 5,
-  "comments": "Love the anime archive",
-  "submittedAt": "2026-03-31T10:36:13.042Z"
-}
-```
-
-When `MONGODB_URI` is configured, the same feedback is also inserted into Atlas database `MONGODB_DB` and collection `MONGODB_COLLECTION`.
-
-## 🎨 Design Features
-
-### Color Scheme
-- **Primary**: Vibrant Pink (#ff006d)
-- **Secondary**: Electric Blue (#0066ff)
-- **Accent**: Bright Yellow (#ffbe0b)
-- **Dark Background**: Deep Navy (#1a1a2e)
-
-### UI Elements
-- Animated header with gradient and scroll effect
-- Smooth navigation with active state indicators
-- Responsive anime card grid with hover effects
-- Star rating system with hover animation
-- Success/error message notifications
-- Mobile-responsive design
-
-## 📱 Responsive Design
-
-The interface is fully responsive and works on:
-- **Desktop**: Full featured experience
-- **Tablet**: Adjusted layout with optimized controls
-- **Mobile**: Single column layout with touch-friendly buttons
-
-## 🔧 Project Structure
-
-```
+```text
 demo-backend/
-├── app.js                          # Express server and API routes
-├── package.json                    # Dependencies and scripts
-├── README.md                       # This file
+├── app.js
+├── index.js
+├── server.js
+├── package.json
+├── data/
+├── feedbacks/
 ├── public/
-│   ├── index.html                 # Main frontend interface
-│   ├── app.js                     # Frontend JavaScript logic
-│   └── styles.css                 # Anime-themed styling
-└── feedbacks/                     # Storage for feedback submissions
-    ├── feedback_[timestamp].json
-    └── ...
+└── scripts/
 ```
 
-## 🚀 Extending the Backend
+## Operational notes
 
-### Add More Anime
-Edit `app.js` and add new objects to the `animeSeries` array:
+- The server enables CORS for the local frontend and the deployed GitHub Pages origin.
+- Static assets are served from `public/`.
+- Feedback remains available locally even when MongoDB is not configured.
+- The API returns JSON errors for validation failures, missing anime records, and storage issues.
 
-```javascript
-{
-    "_id": 11,
-    "title": "New Anime Title",
-    "img_name": "images/new-anime.jpg",
-    "year": 2024,
-    "era": "2020s",
-    "genre": "Action, Adventure",
-    "synopsis": "Description here...",
-    "studio": "Studio Name",
-    "episodes": 12
-}
-```
+## Support
 
-### Add More API Endpoints
-Extend the Express app in `app.js` with additional routes:
+If something is not working, verify:
 
-```javascript
-app.get("/api/custom-endpoint", (req, res) => {
-  // Your custom logic here
-  res.send(data);
-});
-```
-
-## 🔐 Validation
-
-The API includes built-in validation:
-- Feedback requires `name` and `email` fields
-- Rating is converted to integer
-- Timestamps are automatically added
-- Invalid IDs return 404 errors
-
-## 📝 Notes
-
-- The backend uses CORS to allow cross-origin requests
-- All feedback is persisted locally; no database required
-- The frontend automatically handles server errors gracefully
-- Images are loaded from the `public/images/` directory
-
-## 🤝 Integration with Frontend
-
-To use this backend with your Anime Archive frontend:
-
-1. Ensure the backend is running on port 3001
-2. Update your frontend to call the API endpoints:
-   - `GET http://localhost:3001/api/anime` for anime data
-   - `POST http://localhost:3001/api/feedback` for feedback submission
-
-## 📞 Support
-
-If you encounter any issues:
-1. Check that Node.js is installed: `node --version`
-2. Verify dependencies are installed: `npm install`
-3. Ensure port 3001 is not in use: `lsof -i :3001`
-4. Check the server logs in the terminal
-
-## ✨ Features Coming Soon
-
-- Database integration for persistent storage
-- Authentication system for admin feedback review
-- Advanced filtering and pagination
-- Export feedback to CSV
-- User authentication for favorites
-- Anime recommendation system
-
----
-
-🎌 **Anime Archive Backend** | Powered by Express.js | v1.0.0
+1. `node --version`
+2. `npm install`
+3. `npm test`
+4. `npm run verify:images`
+5. `lsof -i :3001`
