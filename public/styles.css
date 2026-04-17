@@ -1787,8 +1787,8 @@ body[data-theme="dark"] .action-btn.integration {
     }
 }
 
-/* Tablet breakpoint: show sidebar toggle */
-@media (min-width: 641px) and (max-width: 1024px) {
+/* Tablet breakpoint (720px-1100px): show sidebar toggle */
+@media (min-width: 720px) and (max-width: 1100px) {
     .sidebar-toggle-btn {
         display: flex;
         align-items: center;
@@ -1914,7 +1914,8 @@ body[data-theme="dark"] .action-btn.integration {
     }
 }
 
-@media (max-width: 640px) {
+/* Mobile phone breakpoints (320px-719px) */
+@media (max-width: 719px) {
     .hero {
         min-height: 38vh;
         padding: 2rem 0.85rem;
@@ -2289,7 +2290,8 @@ body[data-theme="dark"] .action-btn.integration {
     }
 }
 
-@media (max-width: 420px) {
+/* Extra small mobile devices (320px-479px) */
+@media (max-width: 479px) {
     :root {
         --toggle-knob-shift: 24px;
     }

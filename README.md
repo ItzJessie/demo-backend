@@ -1,10 +1,15 @@
-# Anime Archive Backend API
+# Japanese Animation History Archive Backend API
 
 Express-based backend for the Anime Archive project. It serves the anime dataset, studio and creator metadata, feedback storage, image uploads, and a route catalog used by the tests and frontend.
 
 ## Overview
 
 The app starts from `index.js` and `server.js`, both of which load the shared server implementation in `app.js`. The server serves static files from `public/` and exposes JSON APIs under `/api`.
+
+Important runtime note:
+
+- Anime create/update/delete changes are applied in memory for the current process and are **not** persisted back to `data/animeSeries.json`.
+- Feedback submissions are persisted to local JSON files under `feedbacks/`.
 
 ## Requirements
 
@@ -45,6 +50,7 @@ MONGODB_COLLECTION=feedbacks
 Notes:
 
 - `FRONTEND_ORIGIN` and `FRONTEND_ORIGINS` extend the CORS allowlist.
+- In non-production mode, localhost, private-network, and `.local` origins are also allowed for cross-device testing.
 - If `MONGODB_URI` is set, feedback is also inserted into the configured MongoDB collection.
 - If `STUDIOS_CREATORS_FILE` is set, the studios/creators endpoint reads from that file instead of `data/studiosCreators.json`.
 
@@ -146,6 +152,12 @@ POST /api/upload-image
 
 Uploads a single image file using multipart form data with the field name `image`.
 
+Upload rules:
+
+- Max file size: 5MB
+- Allowed types: `image/*`
+- Stored location: `public/images/uploads`
+
 ### Studios and creators
 
 ```http
@@ -193,6 +205,26 @@ Anime records in `data/animeSeries.json` use this structure:
 }
 ```
 
+## Scripts
+
+```bash
+npm run <script>
+```
+
+Available scripts:
+
+- `start`: start the backend server (`node index.js`)
+- `test`: run the Node test suite (`node --test`)
+- `verify`: run tests plus image verification
+- `verify:images`: validate anime image paths against files in `public/images`
+- `verify:routes`: validate route coverage for create endpoints
+- `dedupe:image-refs`: deduplicate anime image references
+- `sync:images`: synchronize image assets
+- `repair:anime-covers`: repair anime cover images
+- `repair:creator-images`: repair creator image assets
+- `image-remap`: remap image references
+- `deploy`: push `main` to origin
+
 ## Verification and tests
 
 ```bash
@@ -206,6 +238,13 @@ What these do:
 - `npm test` runs the Node test suite in `test/api.test.js`.
 - `npm run verify:images` checks anime image references against files in `public/images`.
 - `npm run verify:routes` validates the create-endpoint coverage used by the repo scripts.
+
+## Security and platform behavior
+
+- CORS is enabled with an allowlist that includes deployed frontend origins plus development-safe local origins.
+- Static assets are served from `public/`.
+- Request parsing limits are configured at `10mb` for JSON and URL-encoded bodies.
+- Responses include hardening headers such as `X-Content-Type-Options`, `X-Frame-Options`, and `X-XSS-Protection`.
 
 ## Project structure
 
@@ -226,6 +265,7 @@ demo-backend/
 - The server enables CORS for the local frontend and the deployed GitHub Pages origin.
 - Static assets are served from `public/`.
 - Feedback remains available locally even when MongoDB is not configured.
+- Anime record edits are process-local and reset when the server restarts.
 - The API returns JSON errors for validation failures, missing anime records, and storage issues.
 
 ## Support
