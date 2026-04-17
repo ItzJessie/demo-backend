@@ -30,6 +30,33 @@
             </button>
         </div>
 
+        <aside
+            id="apiHealthWidget"
+            class="api-health-widget"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+        >
+            <p class="api-health-eyebrow">Ops Monitor</p>
+            <p class="api-health-title">API Health</p>
+            <div class="api-health-row">
+                <span
+                    id="apiHealthIndicator"
+                    class="api-health-indicator"
+                    aria-hidden="true"
+                ></span>
+                <strong id="apiHealthStatusText">Checking...</strong>
+            </div>
+            <p class="api-health-metric">
+                Last check
+                <span id="apiHealthLastCheck">Pending</span>
+            </p>
+            <p class="api-health-metric">
+                Avg latency
+                <span id="apiHealthAvgLatency">Pending</span>
+            </p>
+        </aside>
+
         <header class="hero">
             <div class="hero-overlay" aria-hidden="true"></div>
             <div class="hero-content">
@@ -43,493 +70,1269 @@
         </header>
 
         <main class="page-shell">
-            <section class="panel reveal" aria-labelledby="search-heading">
-                <div class="panel-header">
-                    <h2 id="search-heading">Live Anime Search</h2>
-                    <span class="panel-tag">Calls GET /api/anime</span>
-                </div>
-                <form id="animeSearchForm" class="search-row">
-                    <input
-                        id="animeSearchInput"
-                        type="search"
-                        placeholder="Search by title, genre, studio..."
-                        aria-label="Search anime"
-                    />
-                    <button type="submit" class="action-btn primary">
-                        Search API
-                    </button>
-                    <button
-                        id="clearSearchBtn"
-                        type="button"
-                        class="action-btn ghost"
-                    >
-                        Clear
-                    </button>
-                </form>
-                <p id="searchMeta" class="state-note compact">
-                    Start typing and run a live search.
-                </p>
-            </section>
-
-            <section
-                class="panel reveal delay"
-                aria-labelledby="filter-heading"
-            >
-                <div class="panel-header">
-                    <h2 id="filter-heading">Smart Filter Builder</h2>
-                    <span class="panel-tag">Era, Studio, Genre, Episodes</span>
-                </div>
-                <form id="filterForm" class="filter-grid">
-                    <label class="field-wrap">
-                        Era
-                        <select id="eraFilter">
-                            <option value="">All eras</option>
-                        </select>
-                    </label>
-                    <label class="field-wrap">
-                        Studio
-                        <select id="studioFilter">
-                            <option value="">All studios</option>
-                        </select>
-                    </label>
-                    <label class="field-wrap">
-                        Genre contains
-                        <input
-                            id="genreFilter"
-                            type="text"
-                            placeholder="Action, Sci-Fi..."
-                        />
-                    </label>
-                    <label class="field-wrap">
-                        Minimum episodes
-                        <input
-                            id="minEpisodesFilter"
-                            type="number"
-                            min="0"
-                            step="1"
-                            placeholder="0"
-                        />
-                    </label>
-                    <label class="field-wrap">
-                        Sort by
-                        <select id="sortFilter">
-                            <option value="year-asc">Year ascending</option>
-                            <option value="year-desc">Year descending</option>
-                            <option value="episodes-desc">
-                                Episodes high to low
-                            </option>
-                            <option value="title-asc">Title A-Z</option>
-                        </select>
-                    </label>
-                    <div class="filter-actions">
-                        <button type="submit" class="action-btn primary">
-                            Apply Filters
-                        </button>
+            <div class="content-with-nav">
+                <aside class="docs-nav reveal" aria-label="Page contents">
+                    <div class="docs-nav-header">
+                        <div>
+                            <p class="docs-nav-eyebrow">Developer Guide</p>
+                            <h2 class="docs-nav-title">On this page</h2>
+                        </div>
                         <button
-                            id="resetFiltersBtn"
+                            id="sidebarToggleBtn"
                             type="button"
-                            class="action-btn ghost"
+                            class="sidebar-toggle-btn"
+                            aria-label="Toggle sidebar"
+                            aria-expanded="true"
+                            aria-controls="docsNavContent"
                         >
-                            Reset
+                            <span
+                                class="sidebar-toggle-icon"
+                                aria-hidden="true"
+                            ></span>
                         </button>
                     </div>
-                </form>
-                <p id="filterMeta" class="state-note compact">
-                    Filters not applied yet.
-                </p>
-            </section>
-
-            <section class="panel reveal" aria-labelledby="add-anime-heading">
-                <div class="panel-header">
-                    <h2 id="add-anime-heading">
-                        Add New Anime (POST /api/anime)
-                    </h2>
-                    <span class="panel-tag">Joi-validated form submission</span>
-                </div>
-                <form id="addAnimeForm" class="filter-grid">
-                    <label class="field-wrap span-2">
-                        Title *
-                        <input
-                            id="addAnimeTitle"
-                            type="text"
-                            name="title"
-                            required
-                            minlength="2"
-                            maxlength="120"
-                            placeholder="e.g., Fullmetal Alchemist"
-                            aria-label="Anime title"
-                        />
-                    </label>
-                    <label class="field-wrap span-2">
-                        Image Name/Path *
-                        <input
-                            id="addAnimeImgName"
-                            type="text"
-                            name="img_name"
-                            required
-                            minlength="6"
-                            maxlength="512"
-                            pattern="https?://.+|images/.+"
-                            placeholder="e.g., images/versions/anime/title-slug/image.jpg"
-                            aria-label="Image path"
-                        />
-                    </label>
-                    <label class="field-wrap">
-                        Year *
-                        <input
-                            id="addAnimeYear"
-                            type="number"
-                            name="year"
-                            required
-                            min="1960"
-                            max="2100"
-                            step="1"
-                            placeholder="2025"
-                            aria-label="Release year"
-                        />
-                    </label>
-                    <label class="field-wrap span-2">
-                        Genre *
-                        <input
-                            id="addAnimeGenre"
-                            type="text"
-                            name="genre"
-                            required
-                            minlength="2"
-                            maxlength="80"
-                            placeholder="e.g., Action, Adventure, Dark Fantasy"
-                            aria-label="Genre"
-                        />
-                    </label>
-                    <label class="field-wrap span-2">
-                        Synopsis *
-                        <textarea
-                            id="addAnimeSynopsis"
-                            name="synopsis"
-                            required
-                            minlength="20"
-                            maxlength="1200"
-                            rows="3"
-                            placeholder="Brief description of the anime..."
-                            aria-label="Synopsis"
-                        ></textarea>
-                    </label>
-                    <label class="field-wrap">
-                        Studio *
-                        <input
-                            id="addAnimeStudio"
-                            type="text"
-                            name="studio"
-                            required
-                            minlength="2"
-                            maxlength="90"
-                            placeholder="e.g., Bones"
-                            aria-label="Studio"
-                        />
-                    </label>
-                    <label class="field-wrap">
-                        Episodes *
-                        <input
-                            id="addAnimeEpisodes"
-                            type="number"
-                            name="episodes"
-                            required
-                            min="1"
-                            max="2500"
-                            step="1"
-                            placeholder="12"
-                            aria-label="Episode count"
-                        />
-                    </label>
-                    <div class="filter-actions span-2">
-                        <button type="submit" class="action-btn primary">
-                            Add Anime
-                        </button>
-                        <button
-                            id="clearAddAnimeBtn"
-                            type="button"
-                            class="action-btn ghost"
-                        >
-                            Clear Form
-                        </button>
+                    <div id="docsNavContent" class="docs-nav-content">
+                        <p class="docs-nav-copy">
+                            Jump directly to the endpoint or tool you need.
+                        </p>
+                        <nav aria-label="Table of contents">
+                            <ul id="docsTocList" class="docs-toc-list"></ul>
+                        </nav>
                     </div>
-                </form>
-                <p id="addAnimeMeta" class="state-note compact">
-                    Fill all fields to add a new anime record. Required fields
-                    marked with *.
-                </p>
-                <div
-                    id="addAnimeResponse"
-                    class="response-viewer"
-                    style="display: none"
-                ></div>
-            </section>
+                </aside>
 
-            <section class="panel reveal" aria-labelledby="api-heading">
-                <div class="panel-header">
-                    <h2 id="api-heading">Available API Requests</h2>
-                    <a
-                        class="json-link"
-                        href="/api/routes"
-                        target="_blank"
-                        rel="noreferrer"
-                        >Open /api/routes</a
+                <div class="content-main">
+                    <section
+                        class="panel reveal"
+                        aria-labelledby="determination-heading"
                     >
-                </div>
-                <div id="routeList" class="endpoint-grid"></div>
-            </section>
+                        <div class="panel-header">
+                            <h2 id="determination-heading">
+                                Determination Dashboard
+                            </h2>
+                            <span class="panel-tag">Momentum and progress</span>
+                        </div>
 
-            <section class="panel reveal" aria-labelledby="explorer-heading">
-                <div class="panel-header">
-                    <h2 id="explorer-heading">Endpoint Explorer</h2>
-                    <span class="panel-tag"
-                        >Run endpoints without leaving page</span
+                        <div class="determination-grid">
+                            <article class="determination-card">
+                                <h3 class="subheading">Onboarding Progress</h3>
+                                <div class="progress-ring-row">
+                                    <div
+                                        class="progress-ring"
+                                        role="img"
+                                        aria-label="Checklist completion progress"
+                                    >
+                                        <svg
+                                            viewBox="0 0 120 120"
+                                            aria-hidden="true"
+                                        >
+                                            <circle
+                                                class="progress-ring-track"
+                                                cx="60"
+                                                cy="60"
+                                                r="52"
+                                            ></circle>
+                                            <circle
+                                                id="checklistProgressCircle"
+                                                class="progress-ring-value"
+                                                cx="60"
+                                                cy="60"
+                                                r="52"
+                                            ></circle>
+                                        </svg>
+                                        <div class="progress-ring-labels">
+                                            <p id="checklistProgressPercent">
+                                                0%
+                                            </p>
+                                            <p id="checklistProgressCount">
+                                                0/4 done
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        id="resetChecklistBtn"
+                                        type="button"
+                                        class="action-btn ghost"
+                                    >
+                                        Reset Checklist
+                                    </button>
+                                </div>
+
+                                <div
+                                    id="onboardingChecklist"
+                                    class="checklist-grid"
+                                >
+                                    <label class="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            data-checklist-key="search"
+                                        />
+                                        Run a live anime search
+                                    </label>
+                                    <label class="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            data-checklist-key="filters"
+                                        />
+                                        Apply smart filters
+                                    </label>
+                                    <label class="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            data-checklist-key="endpoint"
+                                        />
+                                        Run an endpoint test
+                                    </label>
+                                    <label class="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            data-checklist-key="crud"
+                                        />
+                                        Complete one CRUD action
+                                    </label>
+                                </div>
+                                <p
+                                    id="checklistStatus"
+                                    class="state-note compact"
+                                >
+                                    Determination builds through consistent
+                                    actions.
+                                </p>
+                            </article>
+
+                            <article class="determination-card">
+                                <h3 class="subheading">Usage Meters</h3>
+                                <div class="usage-grid">
+                                    <div class="usage-meter-row">
+                                        <div class="usage-meter-head">
+                                            <span>Endpoint Reach</span>
+                                            <strong id="usageEndpointReachValue"
+                                                >0%</strong
+                                            >
+                                        </div>
+                                        <div class="usage-meter-bar">
+                                            <span
+                                                id="usageEndpointReachBar"
+                                                class="usage-meter-fill"
+                                            ></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="usage-meter-row">
+                                        <div class="usage-meter-head">
+                                            <span>Request Success</span>
+                                            <strong id="usageSuccessRateValue"
+                                                >0%</strong
+                                            >
+                                        </div>
+                                        <div class="usage-meter-bar">
+                                            <span
+                                                id="usageSuccessRateBar"
+                                                class="usage-meter-fill"
+                                            ></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="usage-meter-row">
+                                        <div class="usage-meter-head">
+                                            <span>Visible Catalog</span>
+                                            <strong id="usageCatalogValue"
+                                                >0%</strong
+                                            >
+                                        </div>
+                                        <div class="usage-meter-bar">
+                                            <span
+                                                id="usageCatalogBar"
+                                                class="usage-meter-fill"
+                                            ></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p id="usageSummary" class="state-note compact">
+                                    Build rhythm by stacking small wins.
+                                </p>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section
+                        class="panel reveal"
+                        aria-labelledby="activity-heading"
                     >
-                </div>
-                <form id="endpointExplorerForm" class="explorer-grid">
-                    <label class="field-wrap span-2">
-                        Endpoint
-                        <select id="endpointSelect"></select>
-                    </label>
-                    <label class="field-wrap">
-                        Anime ID (for /api/anime/:id)
-                        <input
-                            id="endpointAnimeId"
-                            type="number"
-                            min="1"
-                            step="1"
-                            value="1"
-                        />
-                    </label>
-                    <label class="field-wrap span-2">
-                        JSON Body (for POST)
-                        <textarea id="endpointBody" rows="6"></textarea>
-                    </label>
-                    <div class="filter-actions span-2">
-                        <button type="submit" class="action-btn primary">
-                            Run Endpoint
-                        </button>
-                        <button
-                            id="fillSampleBodyBtn"
-                            type="button"
-                            class="action-btn ghost"
+                        <div class="panel-header">
+                            <h2 id="activity-heading">
+                                Mission Activity Timeline
+                            </h2>
+                            <span class="panel-tag"
+                                >Recent actions and outcomes</span
+                            >
+                        </div>
+                        <div
+                            id="missionActivityFeed"
+                            class="activity-feed"
+                        ></div>
+                    </section>
+
+                    <section
+                        class="panel reveal"
+                        aria-labelledby="search-heading"
+                    >
+                        <div class="panel-header">
+                            <h2 id="search-heading">Live Anime Search</h2>
+                            <span class="panel-tag">Calls GET /api/anime</span>
+                        </div>
+                        <form id="animeSearchForm" class="search-row">
+                            <input
+                                id="animeSearchInput"
+                                type="search"
+                                placeholder="Search by title, genre, studio..."
+                                aria-label="Search anime"
+                            />
+                            <button type="submit" class="action-btn primary">
+                                Search API
+                            </button>
+                            <button
+                                id="clearSearchBtn"
+                                type="button"
+                                class="action-btn ghost"
+                            >
+                                Clear
+                            </button>
+                        </form>
+                        <p id="searchMeta" class="state-note compact">
+                            Start typing and run a live search.
+                        </p>
+                    </section>
+
+                    <section
+                        class="panel reveal delay"
+                        aria-labelledby="filter-heading"
+                    >
+                        <div class="panel-header">
+                            <h2 id="filter-heading">Smart Filter Builder</h2>
+                            <span class="panel-tag"
+                                >Era, Studio, Genre, Episodes</span
+                            >
+                        </div>
+                        <form id="filterForm" class="filter-grid">
+                            <label class="field-wrap">
+                                Era
+                                <select id="eraFilter">
+                                    <option value="">All eras</option>
+                                </select>
+                            </label>
+                            <label class="field-wrap">
+                                Studio
+                                <select id="studioFilter">
+                                    <option value="">All studios</option>
+                                </select>
+                            </label>
+                            <label class="field-wrap">
+                                Genre contains
+                                <input
+                                    id="genreFilter"
+                                    type="text"
+                                    placeholder="Action, Sci-Fi..."
+                                />
+                            </label>
+                            <label class="field-wrap">
+                                Minimum episodes
+                                <input
+                                    id="minEpisodesFilter"
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    placeholder="0"
+                                />
+                            </label>
+                            <label class="field-wrap">
+                                Sort by
+                                <select id="sortFilter">
+                                    <option value="year-asc">
+                                        Year ascending
+                                    </option>
+                                    <option value="year-desc">
+                                        Year descending
+                                    </option>
+                                    <option value="episodes-desc">
+                                        Episodes high to low
+                                    </option>
+                                    <option value="title-asc">Title A-Z</option>
+                                </select>
+                            </label>
+                            <div class="filter-actions">
+                                <button
+                                    type="submit"
+                                    class="action-btn primary"
+                                >
+                                    Apply Filters
+                                </button>
+                                <button
+                                    id="resetFiltersBtn"
+                                    type="button"
+                                    class="action-btn ghost"
+                                >
+                                    Reset
+                                </button>
+                            </div>
+                        </form>
+                        <p id="filterMeta" class="state-note compact">
+                            Filters not applied yet.
+                        </p>
+                    </section>
+
+                    <section
+                        class="panel reveal"
+                        aria-labelledby="add-anime-heading"
+                    >
+                        <div class="panel-header">
+                            <h2 id="add-anime-heading">
+                                Add New Anime (POST /api/anime)
+                            </h2>
+                            <span class="panel-tag"
+                                >Joi-validated form submission</span
+                            >
+                        </div>
+                        <form id="addAnimeForm" class="filter-grid">
+                            <label class="field-wrap span-2">
+                                Title *
+                                <input
+                                    id="addAnimeTitle"
+                                    type="text"
+                                    name="title"
+                                    required
+                                    minlength="2"
+                                    maxlength="120"
+                                    placeholder="e.g., Fullmetal Alchemist"
+                                    aria-label="Anime title"
+                                />
+                            </label>
+                            <div class="anime-form-image-section span-2">
+                                <div class="anime-form-image-preview">
+                                    <div class="preview-container">
+                                        <img
+                                            id="addAnimePosterPreview"
+                                            src=""
+                                            alt="Poster preview"
+                                            style="display: none"
+                                        />
+                                        <div
+                                            id="addAnimePosterPlaceholder"
+                                            class="preview-placeholder"
+                                        >
+                                            <span>Poster Preview</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <label
+                                    class="anime-form-image-input"
+                                    for="addAnimePosterFile"
+                                >
+                                    <span>Choose Poster Image</span>
+                                    <input
+                                        id="addAnimePosterFile"
+                                        name="poster_file"
+                                        type="file"
+                                        accept="image/*"
+                                        required
+                                        aria-label="Choose poster image"
+                                    />
+                                    <p
+                                        id="addAnimePosterFileLabel"
+                                        class="anime-form-image-name"
+                                    >
+                                        No file selected
+                                    </p>
+                                </label>
+
+                                <input
+                                    id="addAnimeImgName"
+                                    type="hidden"
+                                    name="img_name"
+                                />
+                            </div>
+                            <label class="field-wrap">
+                                Year *
+                                <input
+                                    id="addAnimeYear"
+                                    type="number"
+                                    name="year"
+                                    required
+                                    min="1960"
+                                    max="2100"
+                                    step="1"
+                                    placeholder="2025"
+                                    aria-label="Release year"
+                                />
+                            </label>
+                            <label class="field-wrap span-2">
+                                Genre *
+                                <input
+                                    id="addAnimeGenre"
+                                    type="text"
+                                    name="genre"
+                                    required
+                                    minlength="2"
+                                    maxlength="80"
+                                    placeholder="e.g., Action, Adventure, Dark Fantasy"
+                                    aria-label="Genre"
+                                />
+                            </label>
+                            <label class="field-wrap span-2">
+                                Synopsis *
+                                <textarea
+                                    id="addAnimeSynopsis"
+                                    name="synopsis"
+                                    required
+                                    minlength="20"
+                                    maxlength="1200"
+                                    rows="3"
+                                    placeholder="Brief description of the anime..."
+                                    aria-label="Synopsis"
+                                ></textarea>
+                            </label>
+                            <label class="field-wrap">
+                                Studio *
+                                <input
+                                    id="addAnimeStudio"
+                                    type="text"
+                                    name="studio"
+                                    required
+                                    minlength="2"
+                                    maxlength="90"
+                                    placeholder="e.g., Bones"
+                                    aria-label="Studio"
+                                />
+                            </label>
+                            <label class="field-wrap">
+                                Episodes *
+                                <input
+                                    id="addAnimeEpisodes"
+                                    type="number"
+                                    name="episodes"
+                                    required
+                                    min="1"
+                                    max="2500"
+                                    step="1"
+                                    placeholder="12"
+                                    aria-label="Episode count"
+                                />
+                            </label>
+                            <div class="filter-actions span-2">
+                                <button
+                                    type="submit"
+                                    class="action-btn primary"
+                                >
+                                    Add Anime
+                                </button>
+                                <button
+                                    id="clearAddAnimeBtn"
+                                    type="button"
+                                    class="action-btn ghost"
+                                >
+                                    Clear Form
+                                </button>
+                            </div>
+                        </form>
+                        <p id="addAnimeMeta" class="state-note compact">
+                            Fill all fields to add a new anime record. Required
+                            fields marked with *.
+                        </p>
+                        <div
+                            id="addAnimeResponse"
+                            class="response-viewer"
+                            style="display: none"
+                        ></div>
+                    </section>
+
+                    <section
+                        class="panel reveal"
+                        aria-labelledby="edit-anime-heading"
+                    >
+                        <div class="panel-header">
+                            <h2 id="edit-anime-heading">
+                                Edit Anime (PUT /api/anime/:id)
+                            </h2>
+                            <span class="panel-tag"
+                                >Update existing anime records</span
+                            >
+                        </div>
+                        <form id="editAnimeForm" class="filter-grid">
+                            <label class="field-wrap span-2">
+                                Select Anime *
+                                <select
+                                    id="editAnimeSelect"
+                                    required
+                                    aria-label="Select anime to edit"
+                                >
+                                    <option value="">
+                                        Choose an anime by ID and title
+                                    </option>
+                                </select>
+                            </label>
+                            <label class="field-wrap span-2">
+                                Title *
+                                <input
+                                    id="editAnimeTitle"
+                                    type="text"
+                                    name="title"
+                                    required
+                                    minlength="2"
+                                    maxlength="120"
+                                    placeholder="e.g., Fullmetal Alchemist"
+                                    aria-label="Anime title"
+                                />
+                            </label>
+                            <div class="anime-form-image-section span-2">
+                                <div class="anime-form-image-preview">
+                                    <div class="preview-container">
+                                        <img
+                                            id="editAnimePosterPreview"
+                                            src=""
+                                            alt="Poster preview"
+                                            style="display: none"
+                                        />
+                                        <div
+                                            id="editAnimePosterPlaceholder"
+                                            class="preview-placeholder"
+                                        >
+                                            <span>Poster Preview</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <label
+                                    class="anime-form-image-input"
+                                    for="editAnimePosterFile"
+                                >
+                                    <span>Choose Poster Image</span>
+                                    <input
+                                        id="editAnimePosterFile"
+                                        name="edit_poster_file"
+                                        type="file"
+                                        accept="image/*"
+                                        aria-label="Choose poster image"
+                                    />
+                                    <p
+                                        id="editAnimePosterFileLabel"
+                                        class="anime-form-image-name"
+                                    >
+                                        No new file selected (keeping current
+                                        poster)
+                                    </p>
+                                </label>
+
+                                <input
+                                    id="editAnimeImgName"
+                                    type="hidden"
+                                    name="img_name"
+                                />
+                            </div>
+                            <label class="field-wrap">
+                                Year *
+                                <input
+                                    id="editAnimeYear"
+                                    type="number"
+                                    name="year"
+                                    required
+                                    min="1960"
+                                    max="2100"
+                                    step="1"
+                                    placeholder="2025"
+                                    aria-label="Release year"
+                                />
+                            </label>
+                            <label class="field-wrap span-2">
+                                Genre *
+                                <input
+                                    id="editAnimeGenre"
+                                    type="text"
+                                    name="genre"
+                                    required
+                                    minlength="2"
+                                    maxlength="80"
+                                    placeholder="e.g., Action, Adventure, Dark Fantasy"
+                                    aria-label="Genre"
+                                />
+                            </label>
+                            <label class="field-wrap span-2">
+                                Synopsis *
+                                <textarea
+                                    id="editAnimeSynopsis"
+                                    name="synopsis"
+                                    required
+                                    minlength="20"
+                                    maxlength="1200"
+                                    rows="3"
+                                    placeholder="Brief description of the anime..."
+                                    aria-label="Synopsis"
+                                ></textarea>
+                            </label>
+                            <label class="field-wrap">
+                                Studio *
+                                <input
+                                    id="editAnimeStudio"
+                                    type="text"
+                                    name="studio"
+                                    required
+                                    minlength="2"
+                                    maxlength="90"
+                                    placeholder="e.g., Bones"
+                                    aria-label="Studio"
+                                />
+                            </label>
+                            <label class="field-wrap">
+                                Episodes *
+                                <input
+                                    id="editAnimeEpisodes"
+                                    type="number"
+                                    name="episodes"
+                                    required
+                                    min="1"
+                                    max="2500"
+                                    step="1"
+                                    placeholder="12"
+                                    aria-label="Episode count"
+                                />
+                            </label>
+                            <div class="filter-actions span-2">
+                                <button
+                                    type="submit"
+                                    class="action-btn primary"
+                                >
+                                    Save Changes
+                                </button>
+                                <button
+                                    id="clearEditAnimeBtn"
+                                    type="button"
+                                    class="action-btn ghost"
+                                >
+                                    Clear Edit Form
+                                </button>
+                            </div>
+                        </form>
+                        <p id="editAnimeMeta" class="state-note compact">
+                            Choose an anime, update fields, then save changes to
+                            the API.
+                        </p>
+                        <div
+                            id="editAnimeResponse"
+                            class="response-viewer"
+                            style="display: none"
+                        ></div>
+                    </section>
+
+                    <section
+                        class="panel reveal"
+                        aria-labelledby="delete-anime-heading"
+                    >
+                        <div class="panel-header">
+                            <h2 id="delete-anime-heading">
+                                Delete Anime (DELETE /api/anime/:id)
+                            </h2>
+                            <span class="panel-tag">Remove records by ID</span>
+                        </div>
+                        <form id="deleteAnimeForm" class="filter-grid">
+                            <label class="field-wrap span-2">
+                                Select Anime To Delete *
+                                <select
+                                    id="deleteAnimeSelect"
+                                    required
+                                    aria-label="Select anime to delete"
+                                >
+                                    <option value="">
+                                        Choose an anime by ID and title
+                                    </option>
+                                </select>
+                            </label>
+                            <div class="filter-actions span-2">
+                                <button
+                                    type="submit"
+                                    class="action-btn primary"
+                                >
+                                    Delete Anime
+                                </button>
+                            </div>
+                        </form>
+                        <p id="deleteAnimeMeta" class="state-note compact">
+                            Select an anime and confirm deletion when prompted.
+                        </p>
+                        <div
+                            id="deleteAnimeResponse"
+                            class="response-viewer"
+                            style="display: none"
+                        ></div>
+                    </section>
+
+                    <section class="panel reveal" aria-labelledby="api-heading">
+                        <div class="panel-header">
+                            <h2 id="api-heading">Available API Requests</h2>
+                            <a
+                                class="json-link"
+                                href="/api/routes"
+                                target="_blank"
+                                rel="noreferrer"
+                                >Open /api/routes</a
+                            >
+                        </div>
+                        <div id="routeList" class="endpoint-grid"></div>
+                    </section>
+
+                    <section
+                        class="panel reveal"
+                        aria-labelledby="explorer-heading"
+                    >
+                        <div class="panel-header">
+                            <h2 id="explorer-heading">Endpoint Explorer</h2>
+                            <span class="panel-tag"
+                                >Run endpoints without leaving page</span
+                            >
+                        </div>
+                        <form id="endpointExplorerForm" class="explorer-grid">
+                            <label class="field-wrap span-2">
+                                Endpoint
+                                <select id="endpointSelect"></select>
+                            </label>
+                            <label class="field-wrap">
+                                Anime ID (for /api/anime/:id)
+                                <input
+                                    id="endpointAnimeId"
+                                    type="number"
+                                    min="1"
+                                    step="1"
+                                    value="1"
+                                />
+                            </label>
+                            <label class="field-wrap span-2">
+                                JSON Body (for POST)
+                                <textarea id="endpointBody" rows="6"></textarea>
+                            </label>
+                            <label
+                                id="endpointFileField"
+                                class="field-wrap span-2"
+                                hidden
+                            >
+                                File Upload (for POST /api/upload-image)
+                                <input
+                                    id="endpointFile"
+                                    type="file"
+                                    accept="image/*"
+                                    aria-label="Upload image file"
+                                />
+                            </label>
+                            <div class="filter-actions span-2">
+                                <button
+                                    type="submit"
+                                    class="action-btn primary"
+                                >
+                                    Run Endpoint
+                                </button>
+                                <button
+                                    id="fillSampleBodyBtn"
+                                    type="button"
+                                    class="action-btn ghost"
+                                >
+                                    Fill Sample POST Body
+                                </button>
+                            </div>
+                        </form>
+                        <p id="endpointFormHint" class="state-note compact">
+                            Select an endpoint to configure required inputs.
+                        </p>
+                        <div
+                            class="snippet-shell"
+                            aria-labelledby="snippet-heading"
                         >
-                            Fill Sample POST Body
-                        </button>
-                    </div>
-                </form>
-                <div class="integration-row">
-                    <button
-                        type="button"
-                        class="action-btn integration"
-                        data-method="GET"
-                        data-path="/api/anime"
-                    >
-                        Try GET /api/anime
-                    </button>
-                    <button
-                        type="button"
-                        class="action-btn integration"
-                        data-method="GET"
-                        data-path="/api/routes"
-                    >
-                        Try GET /api/routes
-                    </button>
-                    <button
-                        type="button"
-                        class="action-btn integration"
-                        data-method="GET"
-                        data-path="/api/health"
-                    >
-                        Try GET /api/health
-                    </button>
-                    <button
-                        type="button"
-                        class="action-btn integration"
-                        data-method="GET"
-                        data-path="/api/feedback"
-                    >
-                        Try GET /api/feedback
-                    </button>
-                    <button
-                        type="button"
-                        class="action-btn integration"
-                        data-method="GET"
-                        data-path="/api/studios-creators"
-                    >
-                        Try GET /api/studios-creators
-                    </button>
-                </div>
-            </section>
+                            <div class="snippet-head">
+                                <h3 id="snippet-heading" class="subheading">
+                                    Auto-generated Request Snippets
+                                </h3>
+                                <button
+                                    id="copySnippetBtn"
+                                    type="button"
+                                    class="action-btn ghost"
+                                >
+                                    Copy Active Snippet
+                                </button>
+                            </div>
+                            <div
+                                class="snippet-tab-row"
+                                role="tablist"
+                                aria-label="Code snippet language"
+                            >
+                                <button
+                                    type="button"
+                                    id="snippetTabCurl"
+                                    class="snippet-tab is-active"
+                                    role="tab"
+                                    aria-selected="true"
+                                    data-snippet-tab="curl"
+                                >
+                                    curl
+                                </button>
+                                <button
+                                    type="button"
+                                    id="snippetTabJavascript"
+                                    class="snippet-tab"
+                                    role="tab"
+                                    aria-selected="false"
+                                    data-snippet-tab="javascript"
+                                >
+                                    JavaScript
+                                </button>
+                                <button
+                                    type="button"
+                                    id="snippetTabPython"
+                                    class="snippet-tab"
+                                    role="tab"
+                                    aria-selected="false"
+                                    data-snippet-tab="python"
+                                >
+                                    Python
+                                </button>
+                            </div>
+                            <pre
+                                id="snippetCurl"
+                                class="response-viewer code-snippet-viewer"
+                                role="tabpanel"
+                                aria-labelledby="snippetTabCurl"
+                                data-snippet-panel="curl"
+                            ></pre>
+                            <pre
+                                id="snippetJavascript"
+                                class="response-viewer code-snippet-viewer"
+                                role="tabpanel"
+                                aria-labelledby="snippetTabJavascript"
+                                data-snippet-panel="javascript"
+                                hidden
+                            ></pre>
+                            <pre
+                                id="snippetPython"
+                                class="response-viewer code-snippet-viewer"
+                                role="tabpanel"
+                                aria-labelledby="snippetTabPython"
+                                data-snippet-panel="python"
+                                hidden
+                            ></pre>
+                            <p id="snippetMeta" class="state-note compact">
+                                Snippets update automatically based on endpoint
+                                and current form inputs.
+                            </p>
+                        </div>
+                        <div class="integration-row">
+                            <button
+                                type="button"
+                                class="action-btn integration"
+                                data-method="GET"
+                                data-path="/api/anime"
+                            >
+                                Try GET /api/anime
+                            </button>
+                            <button
+                                type="button"
+                                class="action-btn integration"
+                                data-method="GET"
+                                data-path="/api/routes"
+                            >
+                                Try GET /api/routes
+                            </button>
+                            <button
+                                type="button"
+                                class="action-btn integration"
+                                data-method="GET"
+                                data-path="/api/health"
+                            >
+                                Try GET /api/health
+                            </button>
+                            <button
+                                type="button"
+                                class="action-btn integration"
+                                data-method="GET"
+                                data-path="/api/feedback"
+                            >
+                                Try GET /api/feedback
+                            </button>
+                            <button
+                                type="button"
+                                class="action-btn integration"
+                                data-method="GET"
+                                data-path="/api/studios-creators"
+                            >
+                                Try GET /api/studios-creators
+                            </button>
+                        </div>
+                    </section>
 
-            <section
-                class="panel reveal delay"
-                aria-labelledby="timeline-heading"
-            >
-                <div class="panel-header">
-                    <h2 id="timeline-heading">
-                        Animated Anime History Timeline
-                    </h2>
-                    <span class="panel-tag">Chronological release journey</span>
-                </div>
-                <div id="timelineTrack" class="timeline-track"></div>
-            </section>
+                    <section
+                        class="panel reveal"
+                        aria-labelledby="bulk-runner-heading"
+                    >
+                        <div class="panel-header">
+                            <h2 id="bulk-runner-heading">
+                                Bulk Request Runner
+                            </h2>
+                            <span class="panel-tag"
+                                >Compare responses across IDs</span
+                            >
+                        </div>
+                        <form
+                            id="bulkRunnerForm"
+                            class="explorer-grid bulk-runner-grid"
+                        >
+                            <label class="field-wrap span-2">
+                                Endpoint (ID-based GET routes)
+                                <select id="bulkEndpointSelect"></select>
+                            </label>
+                            <label class="field-wrap span-2">
+                                Anime IDs
+                                <input
+                                    id="bulkIdsInput"
+                                    type="text"
+                                    value="1, 2, 3"
+                                    placeholder="e.g., 1, 5, 12, 42"
+                                    aria-label="Comma-separated anime IDs"
+                                />
+                            </label>
+                            <div class="filter-actions span-2">
+                                <button
+                                    id="bulkRunBtn"
+                                    type="submit"
+                                    class="action-btn primary"
+                                >
+                                    Run Bulk Requests
+                                </button>
+                                <button
+                                    id="bulkResetBtn"
+                                    type="button"
+                                    class="action-btn ghost"
+                                >
+                                    Reset Results
+                                </button>
+                            </div>
+                        </form>
+                        <p id="bulkRunnerMeta" class="state-note compact">
+                            Enter IDs and run the same endpoint for each ID.
+                        </p>
+                        <div
+                            id="bulkRunnerResults"
+                            class="bulk-results-grid"
+                        ></div>
+                        <pre
+                            id="bulkComparisonViewer"
+                            class="response-viewer bulk-compare-view"
+                            style="display: none"
+                        ></pre>
+                    </section>
 
-            <section class="panel reveal" aria-labelledby="response-heading">
-                <div class="panel-header">
-                    <h2 id="response-heading">Live API Response</h2>
-                    <p id="responseMeta" class="response-meta">
-                        Run an endpoint to inspect status and JSON.
-                    </p>
-                </div>
-                <pre id="apiResponseViewer" class="response-viewer">
+                    <section
+                        class="panel reveal delay"
+                        aria-labelledby="error-help-heading"
+                    >
+                        <div class="panel-header">
+                            <h2 id="error-help-heading">
+                                Common Validation and Server Errors
+                            </h2>
+                            <span class="panel-tag">Fast recovery tips</span>
+                        </div>
+                        <div class="endpoint-grid troubleshoot-grid">
+                            <article class="endpoint-card troubleshoot-card">
+                                <span class="error-code-pill"
+                                    >400 Validation failed</span
+                                >
+                                <h3 class="subheading">
+                                    Payload does not meet field rules
+                                </h3>
+                                <p class="endpoint-desc">
+                                    Example:
+                                    <span class="error-inline-code"
+                                        >POST /api/anime</span
+                                    >
+                                    with a title under 2 characters, a missing
+                                    image path, or a year outside the allowed
+                                    range.
+                                </p>
+                                <p class="error-help-line">
+                                    Fix: use the form hints, keep required
+                                    fields filled, and make sure
+                                    <span class="error-inline-code"
+                                        >img_name</span
+                                    >, year, genre, synopsis, studio, and
+                                    episodes match the limits.
+                                </p>
+                            </article>
+
+                            <article class="endpoint-card troubleshoot-card">
+                                <span class="error-code-pill"
+                                    >400 Invalid JSON</span
+                                >
+                                <h3 class="subheading">
+                                    Request body cannot be parsed
+                                </h3>
+                                <p class="endpoint-desc">
+                                    Example: sending a body with trailing
+                                    commas, unmatched braces, or plain text to a
+                                    JSON endpoint.
+                                </p>
+                                <p class="error-help-line">
+                                    Fix: resend valid JSON, or use the sample
+                                    body from Endpoint Explorer before trying
+                                    the request again.
+                                </p>
+                            </article>
+
+                            <article class="endpoint-card troubleshoot-card">
+                                <span class="error-code-pill"
+                                    >404 Anime not found</span
+                                >
+                                <h3 class="subheading">
+                                    The record ID does not exist
+                                </h3>
+                                <p class="endpoint-desc">
+                                    Example:
+                                    <span class="error-inline-code"
+                                        >PUT /api/anime/:id</span
+                                    >
+                                    or
+                                    <span class="error-inline-code"
+                                        >DELETE /api/anime/:id</span
+                                    >
+                                    using an ID that was already removed or
+                                    never existed.
+                                </p>
+                                <p class="error-help-line">
+                                    Fix: choose an ID from
+                                    <span class="error-inline-code"
+                                        >/api/anime</span
+                                    >
+                                    or refresh the list before retrying the
+                                    action.
+                                </p>
+                            </article>
+
+                            <article class="endpoint-card troubleshoot-card">
+                                <span class="error-code-pill"
+                                    >409 Duplicate record</span
+                                >
+                                <h3 class="subheading">
+                                    The anime already exists
+                                </h3>
+                                <p class="endpoint-desc">
+                                    Example: creating a record with a title or
+                                    slug that matches an existing anime entry.
+                                </p>
+                                <p class="error-help-line">
+                                    Fix: adjust the title or slug, then submit
+                                    again after confirming the record is not
+                                    already in the catalog.
+                                </p>
+                            </article>
+
+                            <article class="endpoint-card troubleshoot-card">
+                                <span class="error-code-pill"
+                                    >500 Server error</span
+                                >
+                                <h3 class="subheading">
+                                    Backend could not finish the request
+                                </h3>
+                                <p class="endpoint-desc">
+                                    Example: a data file cannot be read, the
+                                    backend is offline, or feedback storage
+                                    fails during save.
+                                </p>
+                                <p class="error-help-line">
+                                    Fix: confirm the server is running, retry
+                                    once, then check the response details or
+                                    server logs for the failing subsystem.
+                                </p>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section
+                        class="panel reveal delay"
+                        aria-labelledby="timeline-heading"
+                    >
+                        <div class="panel-header">
+                            <h2 id="timeline-heading">
+                                Animated Anime History Timeline
+                            </h2>
+                            <span class="panel-tag"
+                                >Chronological release journey</span
+                            >
+                        </div>
+                        <div id="timelineTrack" class="timeline-track"></div>
+                    </section>
+
+                    <section
+                        class="panel reveal"
+                        aria-labelledby="response-heading"
+                    >
+                        <div class="panel-header">
+                            <h2 id="response-heading">Live API Response</h2>
+                            <p id="responseMeta" class="response-meta">
+                                Run an endpoint to inspect status and JSON.
+                            </p>
+                        </div>
+                        <pre id="apiResponseViewer" class="response-viewer">
 {
   "message": "Response output will appear here"
 }</pre
-                >
-            </section>
+                        >
+                    </section>
 
-            <section
-                class="panel reveal mobile-toggle-panel"
-                aria-label="Mobile content toggle"
-            >
-                <div class="panel-header">
-                    <h2>Mobile Content Toggle</h2>
-                    <span class="panel-tag">Anime or Studios & Creators</span>
-                </div>
-                <div
-                    class="mobile-toggle-group"
-                    role="tablist"
-                    aria-label="Choose content section"
-                >
-                    <button
-                        id="animeMobileToggleBtn"
-                        type="button"
-                        class="action-btn primary mobile-toggle-btn is-active"
-                        aria-pressed="true"
-                        data-target="animePreviewSection"
+                    <section
+                        class="panel reveal mobile-toggle-panel"
+                        aria-label="Mobile content toggle"
                     >
-                        Anime Series
-                    </button>
-                    <button
-                        id="studiosCreatorsMobileToggleBtn"
-                        type="button"
-                        class="action-btn ghost mobile-toggle-btn"
-                        aria-pressed="false"
-                        data-target="studiosCreatorsPreviewSection"
-                    >
-                        Studios & Creators
-                    </button>
-                </div>
-                <p class="state-note compact mobile-toggle-note">
-                    On phones, use this switch to show one data section at a
-                    time.
-                </p>
-            </section>
+                        <div class="panel-header">
+                            <h2>Mobile Content Toggle</h2>
+                            <span class="panel-tag"
+                                >Anime or Studios & Creators</span
+                            >
+                        </div>
+                        <div
+                            class="mobile-toggle-group"
+                            role="tablist"
+                            aria-label="Choose content section"
+                        >
+                            <button
+                                id="animeMobileToggleBtn"
+                                type="button"
+                                class="action-btn primary mobile-toggle-btn is-active"
+                                aria-pressed="true"
+                                data-target="animePreviewSection"
+                            >
+                                Anime Series
+                            </button>
+                            <button
+                                id="studiosCreatorsMobileToggleBtn"
+                                type="button"
+                                class="action-btn ghost mobile-toggle-btn"
+                                aria-pressed="false"
+                                data-target="studiosCreatorsPreviewSection"
+                            >
+                                Studios & Creators
+                            </button>
+                        </div>
+                        <p class="state-note compact mobile-toggle-note">
+                            On phones, use this switch to show one data section
+                            at a time.
+                        </p>
+                    </section>
 
-            <section
-                id="animePreviewSection"
-                class="panel reveal delay mobile-toggle-section"
-                aria-labelledby="anime-heading"
-            >
-                <div class="panel-header">
-                    <h2 id="anime-heading">
-                        Anime Data Preview (GET /api/anime)
-                    </h2>
-                    <a
-                        class="json-link"
-                        href="/api/anime"
-                        target="_blank"
-                        rel="noreferrer"
-                        >Open /api/anime</a
+                    <section
+                        id="animePreviewSection"
+                        class="panel reveal delay mobile-toggle-section"
+                        aria-labelledby="anime-heading"
                     >
-                </div>
-                <div id="animeList" class="anime-grid"></div>
-                <div class="collapse-toggle-row">
-                    <button
-                        id="animeCollapseBtn"
-                        type="button"
-                        class="action-btn ghost collapse-toggle-btn"
-                        aria-expanded="false"
-                    >
-                        Show more anime
-                    </button>
-                </div>
-            </section>
-
-            <section
-                id="studiosCreatorsPreviewSection"
-                class="panel reveal"
-                aria-labelledby="studios-creators-heading"
-                data-mobile-order="second"
-            >
-                <div class="panel-header">
-                    <h2 id="studios-creators-heading">
-                        Studios & Creators Preview (GET /api/studios-creators)
-                    </h2>
-                    <a
-                        class="json-link"
-                        href="/api/studios-creators"
-                        target="_blank"
-                        rel="noreferrer"
-                        >Open /api/studios-creators</a
-                    >
-                </div>
-
-                <form id="studiosCreatorsSearchForm" class="search-row">
-                    <input
-                        id="studiosCreatorsSearchInput"
-                        type="search"
-                        placeholder="Search studios, creators, role, detail..."
-                        aria-label="Search studios and creators"
-                    />
-                    <button type="submit" class="action-btn primary">
-                        Search Data
-                    </button>
-                    <button
-                        id="clearStudiosCreatorsSearchBtn"
-                        type="button"
-                        class="action-btn ghost"
-                    >
-                        Clear
-                    </button>
-                </form>
-
-                <p id="studiosCreatorsMeta" class="state-note compact">
-                    Loading studios and creators data.
-                </p>
-
-                <div class="dual-grid-shell">
-                    <div>
-                        <h3 class="subheading">Studios</h3>
-                        <div id="studiosList" class="knowledge-grid"></div>
+                        <div class="panel-header">
+                            <h2 id="anime-heading">
+                                Anime Data Preview (GET /api/anime)
+                            </h2>
+                            <a
+                                class="json-link"
+                                href="/api/anime"
+                                target="_blank"
+                                rel="noreferrer"
+                                >Open /api/anime</a
+                            >
+                        </div>
+                        <div id="animeList" class="anime-grid"></div>
                         <div class="collapse-toggle-row">
                             <button
-                                id="studiosCollapseBtn"
+                                id="animeCollapseBtn"
                                 type="button"
                                 class="action-btn ghost collapse-toggle-btn"
                                 aria-expanded="false"
                             >
-                                Show more studios
+                                Show more anime
                             </button>
                         </div>
-                    </div>
-                    <div>
-                        <h3 class="subheading">Creators</h3>
-                        <div id="creatorsList" class="knowledge-grid"></div>
-                        <div class="collapse-toggle-row">
-                            <button
-                                id="creatorsCollapseBtn"
-                                type="button"
-                                class="action-btn ghost collapse-toggle-btn"
-                                aria-expanded="false"
+                    </section>
+
+                    <section
+                        id="studiosCreatorsPreviewSection"
+                        class="panel reveal"
+                        aria-labelledby="studios-creators-heading"
+                        data-mobile-order="second"
+                    >
+                        <div class="panel-header">
+                            <h2 id="studios-creators-heading">
+                                Studios & Creators Preview (GET
+                                /api/studios-creators)
+                            </h2>
+                            <a
+                                class="json-link"
+                                href="/api/studios-creators"
+                                target="_blank"
+                                rel="noreferrer"
+                                >Open /api/studios-creators</a
                             >
-                                Show more creators
-                            </button>
                         </div>
-                    </div>
+
+                        <form id="studiosCreatorsSearchForm" class="search-row">
+                            <input
+                                id="studiosCreatorsSearchInput"
+                                type="search"
+                                placeholder="Search studios, creators, role, detail..."
+                                aria-label="Search studios and creators"
+                            />
+                            <button type="submit" class="action-btn primary">
+                                Search Data
+                            </button>
+                            <button
+                                id="clearStudiosCreatorsSearchBtn"
+                                type="button"
+                                class="action-btn ghost"
+                            >
+                                Clear
+                            </button>
+                        </form>
+
+                        <p id="studiosCreatorsMeta" class="state-note compact">
+                            Loading studios and creators data.
+                        </p>
+
+                        <div class="dual-grid-shell">
+                            <div>
+                                <h3 class="subheading">Studios</h3>
+                                <div
+                                    id="studiosList"
+                                    class="knowledge-grid"
+                                ></div>
+                                <div class="collapse-toggle-row">
+                                    <button
+                                        id="studiosCollapseBtn"
+                                        type="button"
+                                        class="action-btn ghost collapse-toggle-btn"
+                                        aria-expanded="false"
+                                    >
+                                        Show more studios
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="subheading">Creators</h3>
+                                <div
+                                    id="creatorsList"
+                                    class="knowledge-grid"
+                                ></div>
+                                <div class="collapse-toggle-row">
+                                    <button
+                                        id="creatorsCollapseBtn"
+                                        type="button"
+                                        class="action-btn ghost collapse-toggle-btn"
+                                        aria-expanded="false"
+                                    >
+                                        Show more creators
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
                 </div>
-            </section>
+            </div>
         </main>
 
         <footer class="site-footer">
