@@ -36,6 +36,10 @@ const FRONTEND_ORIGINS = new Set([
   normalizeOrigin("http://localhost:5173"),
 ]);
 
+const DEV_ORIGIN_REGEX = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
+const DEV_PRIVATE_NETWORK_REGEX = /^https?:\/\/(10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})(:\d+)?$/i;
+const DEV_LOCAL_DOMAIN_REGEX = /^https?:\/\/[a-z0-9-]+\.local(:\d+)?$/i;
+
 if (process.env.FRONTEND_ORIGIN) {
   FRONTEND_ORIGINS.add(normalizeOrigin(process.env.FRONTEND_ORIGIN));
 }
@@ -129,6 +133,31 @@ function toSlug(title) {
     .replace(/^-|-$/g, "");
 }
 
+function isAllowedCorsOrigin(origin) {
+  const normalizedOrigin = normalizeOrigin(origin);
+
+  if (FRONTEND_ORIGINS.has(normalizedOrigin)) {
+    return true;
+  }
+
+  if (DEV_ORIGIN_REGEX.test(normalizedOrigin)) {
+    return true;
+  }
+
+  // Allow private-network and .local hosts for cross-device responsive testing in non-production.
+  if (process.env.NODE_ENV !== "production") {
+    if (DEV_PRIVATE_NETWORK_REGEX.test(normalizedOrigin)) {
+      return true;
+    }
+
+    if (DEV_LOCAL_DOMAIN_REGEX.test(normalizedOrigin)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 async function ensureMongoCollection() {
   if (!MONGODB_URI) {
     return null;
@@ -211,7 +240,7 @@ const corsOptions = {
       return;
     }
 
-    if (FRONTEND_ORIGINS.has(normalizeOrigin(origin))) {
+    if (isAllowedCorsOrigin(origin)) {
       callback(null, true);
       return;
     }
@@ -223,7 +252,30 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.options(/.*/, cors(corsOptions));
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
+
+// Optimize response headers for better performance
+app.use((_req, res, next) => {
+  res.set("X-Content-Type-Options", "nosniff");
+  res.set("X-Frame-Options", "DENY");
+  res.set("X-XSS-Protection", "1; mode=block");
+  next();
+});
+
+// Return a clear 400 when request JSON is malformed instead of a generic server error.
+app.use((err, _req, res, next) => {
+  if (err instanceof SyntaxError && "body" in err) {
+    return res.status(400).json({
+      success: false,
+      error: "Invalid JSON request body",
+      details: [String(err.message || "Malformed JSON")],
+    });
+  }
+
+  return next(err);
+});
+
 app.use(express.static(path.join(__dirname, "public")));
 
 async function handleAnimeRequest(_req, res) {
@@ -376,15 +428,26 @@ async function handleAnimeCreate(req, res) {
 
   try {
     const animeList = await getAnimeList();
+    if (!Array.isArray(animeList)) {
+      return res.status(500).json({
+        success: false,
+        error: "Anime dataset is not available",
+      });
+    }
+
     const resolvedSlug = value.slug || `${toSlug(value.title)}-${value.year}`;
     const resolvedEra = value.era || getEraLabel(value.year);
 
-    const duplicate = animeList.some(
-      (item) =>
-        String(item.slug || "").toLowerCase() === resolvedSlug.toLowerCase() ||
-        (String(item.title || "").toLowerCase() === String(value.title).toLowerCase() &&
-          Number(item.year) === Number(value.year))
-    );
+    const duplicate = animeList.some((item) => {
+      if (!item || typeof item !== "object") {
+        return false;
+      }
+      const slugMatch = String(item.slug || "").toLowerCase() === resolvedSlug.toLowerCase();
+      const titleYearMatch =
+        String(item.title || "").toLowerCase() === String(value.title).toLowerCase() &&
+        Number(item.year) === Number(value.year);
+      return slugMatch || titleYearMatch;
+    });
 
     if (duplicate) {
       return res.status(409).json({
@@ -394,7 +457,7 @@ async function handleAnimeCreate(req, res) {
     }
 
     const nextId = animeList.reduce((maxId, item) => {
-      const currentId = Number(item._id) || 0;
+      const currentId = item && typeof item === "object" ? Number(item._id) || 0 : 0;
       return currentId > maxId ? currentId : maxId;
     }, 0) + 1;
 
@@ -483,13 +546,16 @@ app.put("/api/anime/:id", (req, res) => {
       const resolvedSlug = value.slug || `${toSlug(value.title)}-${value.year}`;
       const resolvedEra = value.era || getEraLabel(value.year);
 
-      const duplicate = animeList.some(
-        (item, index) =>
-          index !== animeIndex &&
-          (String(item.slug || "").toLowerCase() === resolvedSlug.toLowerCase() ||
-            (String(item.title || "").toLowerCase() === String(value.title).toLowerCase() &&
-              Number(item.year) === Number(value.year)))
-      );
+      const duplicate = animeList.some((item, index) => {
+        if (index === animeIndex || !item || typeof item !== "object") {
+          return false;
+        }
+        const slugMatch = String(item.slug || "").toLowerCase() === resolvedSlug.toLowerCase();
+        const titleYearMatch =
+          String(item.title || "").toLowerCase() === String(value.title).toLowerCase() &&
+          Number(item.year) === Number(value.year);
+        return slugMatch || titleYearMatch;
+      });
 
       if (duplicate) {
         return res.status(409).json({
@@ -612,24 +678,57 @@ app.post("/api/feedback", async (req, res) => {
   }
 
   try {
-    await saveFeedbackToLocalFile(feedback);
-
+    let savedToLocal = false;
     let insertedToMongo = false;
-    const collection = await ensureMongoCollection();
-    if (collection) {
-      await collection.insertOne(feedback);
-      insertedToMongo = true;
+    let localError = null;
+    let mongoError = null;
+
+    try {
+      await saveFeedbackToLocalFile(feedback);
+      savedToLocal = true;
+    } catch (err) {
+      localError = String(err && err.message ? err.message : err);
+      console.error("Error saving feedback to local file", err);
+    }
+
+    try {
+      const collection = await ensureMongoCollection();
+      if (collection) {
+        await collection.insertOne(feedback);
+        insertedToMongo = true;
+      }
+    } catch (err) {
+      mongoError = String(err && err.message ? err.message : err);
+      console.error("Error inserting feedback into MongoDB", err);
+    }
+
+    if (!savedToLocal && !insertedToMongo) {
+      return res.status(500).json({
+        success: false,
+        error: "Failed to save feedback",
+        details: [localError || "Local write failed", mongoError || "Mongo write failed"],
+      });
     }
 
     return res.status(201).json({
+      success: true,
       message: "Feedback submitted successfully",
       id: feedback.id,
+      savedToLocal,
       insertedToMongo,
       atlasLocation: insertedToMongo ? `${MONGODB_DB}.${MONGODB_COLLECTION}` : null,
+      warnings: [
+        !savedToLocal && localError ? `Local save failed: ${localError}` : null,
+        !insertedToMongo && mongoError ? `Mongo save failed: ${mongoError}` : null,
+      ].filter(Boolean),
     });
   } catch (err) {
     console.error("Error saving feedback", err);
-    return res.status(500).json({ error: "Failed to save feedback" });
+    return res.status(500).json({
+      success: false,
+      error: "Failed to save feedback",
+      details: [String(err && err.message ? err.message : err)],
+    });
   }
 });
 

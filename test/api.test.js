@@ -51,6 +51,52 @@ test("GET /api/routes returns route metadata", async () => {
   assert.ok(data.routes.length >= 6);
 });
 
+test("GET / serves index.html for the frontend portal", async () => {
+  const response = await fetch(`${baseUrl}/`);
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type") || "", /text\/html/i);
+
+  const html = await response.text();
+  assert.match(html, /<title>Anime Archive API Portal<\/title>/i);
+  assert.match(html, /id="endpointExplorerForm"/i);
+  assert.match(html, /id="bulkRunnerForm"/i);
+});
+
+test("GET /api/routes includes endpoints used by index.html", async () => {
+  const response = await fetch(`${baseUrl}/api/routes`);
+  assert.equal(response.status, 200);
+
+  const data = await response.json();
+  assert.ok(Array.isArray(data.routes));
+
+  const available = new Set(
+    data.routes.map((route) => `${String(route.method || "").toUpperCase()} ${String(route.path || "")}`)
+  );
+
+  const required = [
+    "GET /api/anime",
+    "GET /api/anime/:id",
+    "POST /api/anime",
+    "PUT /api/anime/:id",
+    "DELETE /api/anime/:id",
+    "GET /api/studios-creators",
+    "GET /api/routes",
+    "GET /api/health",
+    "GET /api/feedback",
+    "POST /api/feedback",
+    "POST /api/upload-image",
+    "GET /get",
+    "POST /add",
+    "POST /post",
+    "POST /create",
+    "POST /new",
+  ];
+
+  required.forEach((signature) => {
+    assert.equal(available.has(signature), true, `missing route in /api/routes: ${signature}`);
+  });
+});
+
 test("GET /api/anime returns data", async () => {
   const response = await fetch(`${baseUrl}/api/anime`);
   assert.equal(response.status, 200);
