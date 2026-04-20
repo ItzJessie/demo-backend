@@ -135,6 +135,14 @@ body {
     overflow-x: hidden;
 }
 
+img,
+svg,
+video,
+canvas,
+iframe {
+    max-width: 100%;
+}
+
 body {
     font-family: "Manrope", sans-serif;
     color: var(--brown-800);
@@ -651,43 +659,44 @@ body[data-theme="dark"] .theme-toggle-label {
 
 .sidebar-toggle-icon {
     display: block;
-    width: 100%;
-    height: 100%;
+    width: 16px;
+    height: 2px;
     position: relative;
-    background: radial-gradient(
-        circle at 35% 40%,
-        rgba(255, 255, 255, 0.5),
-        transparent 50%
-    );
+    background: var(--accent);
+    border-radius: 1px;
+    transition: background-color 0.3s ease;
 }
 
 .sidebar-toggle-icon::before,
 .sidebar-toggle-icon::after {
     content: "";
     position: absolute;
-    left: 50%;
+    left: 0;
     width: 16px;
     height: 2px;
     background: var(--accent);
     border-radius: 1px;
-    transform: translateX(-50%);
     transition: transform 0.3s ease;
 }
 
 .sidebar-toggle-icon::before {
-    top: 8px;
+    top: -6px;
 }
 
 .sidebar-toggle-icon::after {
-    bottom: 8px;
+    bottom: -6px;
 }
 
-.sidebar-toggle-btn[aria-expanded="false"] .sidebar-toggle-icon::before {
-    transform: translateX(-50%) rotate(45deg) translateY(-8px);
+.sidebar-toggle-btn[aria-expanded="true"] .sidebar-toggle-icon {
+    background: transparent;
 }
 
-.sidebar-toggle-btn[aria-expanded="false"] .sidebar-toggle-icon::after {
-    transform: translateX(-50%) rotate(-45deg) translateY(8px);
+.sidebar-toggle-btn[aria-expanded="true"] .sidebar-toggle-icon::before {
+    transform: translateY(6px) rotate(45deg);
+}
+
+.sidebar-toggle-btn[aria-expanded="true"] .sidebar-toggle-icon::after {
+    transform: translateY(-6px) rotate(-45deg);
 }
 
 .docs-nav.is-collapsed .docs-nav-content {
@@ -1787,6 +1796,28 @@ body[data-theme="dark"] .action-btn.integration {
     }
 }
 
+/* Small laptops/tablets: reduce dense multi-column layouts before phone breakpoint. */
+@media (max-width: 1024px) {
+    .page-shell {
+        width: min(1320px, 95vw);
+    }
+
+    .content-with-nav {
+        grid-template-columns: 1fr;
+    }
+
+    .docs-nav {
+        position: static;
+    }
+
+    .determination-grid,
+    .dual-grid-shell,
+    .bulk-runner-grid,
+    .explorer-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Tablet breakpoint (720px-1100px): show sidebar toggle */
 @media (min-width: 720px) and (max-width: 1100px) {
     .sidebar-toggle-btn {
@@ -1916,6 +1947,49 @@ body[data-theme="dark"] .action-btn.integration {
 
 /* Mobile phone breakpoints (320px-719px) */
 @media (max-width: 719px) {
+    body {
+        overflow-x: clip;
+        padding-bottom: max(0.8rem, env(safe-area-inset-bottom));
+    }
+
+    .theme-dock,
+    .api-health-widget {
+        position: static;
+        right: auto;
+        top: auto;
+        width: 100%;
+        max-width: none;
+    }
+
+    .theme-dock {
+        padding: 0.65rem 0.8rem 0;
+        margin: 0;
+    }
+
+    .theme-toggle {
+        width: 100%;
+        justify-content: center;
+        min-width: 0;
+        min-height: 44px;
+    }
+
+    .api-health-widget {
+        margin: 0.55rem 0.8rem 0;
+        width: auto;
+    }
+
+    .page-shell,
+    .content-main,
+    .panel,
+    .panel-header,
+    .response-viewer,
+    .snippet-shell,
+    .anime-form-image-section,
+    .anime-form-image-input {
+        min-width: 0;
+        max-width: 100%;
+    }
+
     .hero {
         min-height: 38vh;
         padding: 2rem 0.85rem;
@@ -1925,53 +1999,105 @@ body[data-theme="dark"] .action-btn.integration {
         width: 100%;
     }
 
-    .theme-toggle {
-        min-width: 150px;
-        width: auto;
-    }
-
-    .theme-dock {
-        top: max(0.65rem, env(safe-area-inset-top));
-        right: 0.65rem;
-    }
-
-    .api-health-widget {
-        top: max(4.55rem, calc(env(safe-area-inset-top) + 4rem));
-        right: 0.65rem;
-        width: min(248px, calc(100vw - 1.3rem));
-    }
-
     .back-to-top {
         right: 0.65rem;
         bottom: max(0.65rem, env(safe-area-inset-bottom));
     }
 
     .page-shell {
-        width: min(1320px, 94vw);
+        width: 100%;
+        max-width: 100%;
         margin-top: -2.2rem;
+        padding-inline: 0.72rem;
     }
 
     .content-with-nav {
         grid-template-columns: 1fr;
     }
 
+    .content-with-nav > *,
+    .content-main > *,
+    .panel > *,
+    .determination-card > * {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .docs-nav,
+    .docs-nav-content,
+    .panel,
+    .determination-card,
+    .checklist-item,
+    .usage-meter-row,
+    .activity-item {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .checklist-item,
+    .usage-meter-head,
+    .activity-head {
+        flex-wrap: wrap;
+    }
+
+    .checklist-item {
+        align-items: flex-start;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
     .docs-nav {
-        position: static;
+        position: sticky;
+        top: max(0.5rem, env(safe-area-inset-top));
+        z-index: 18;
         padding: 0.8rem;
+        box-shadow: 0 10px 20px var(--shadow-500);
+    }
+
+    .docs-nav-header {
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .docs-nav-header > div {
+        flex: 1;
+    }
+
+    .docs-nav-copy {
+        display: none;
+    }
+
+    .sidebar-toggle-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+    }
+
+    .docs-nav-content {
+        max-height: 50vh;
+        overflow-y: auto;
+    }
+
+    .docs-nav.is-collapsed .docs-nav-content {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
     }
 
     .docs-toc-list {
-        display: flex;
-        overflow-x: auto;
-        gap: 0.48rem;
-        padding-bottom: 0.18rem;
-        scrollbar-width: thin;
+        display: grid;
+        gap: 0.4rem;
+        padding-bottom: 0;
     }
 
     .docs-toc-link {
-        white-space: nowrap;
-        min-width: max-content;
+        white-space: normal;
+        min-width: 0;
         font-size: 0.8rem;
+        line-height: 1.4;
+        padding: 0.54rem 0.6rem;
     }
 
     .panel {
@@ -1994,6 +2120,14 @@ body[data-theme="dark"] .action-btn.integration {
         grid-template-columns: 1fr;
     }
 
+    .troubleshoot-grid,
+    .bulk-runner-grid,
+    .bulk-results-grid,
+    .knowledge-grid,
+    .explorer-grid {
+        grid-template-columns: 1fr;
+    }
+
     .dual-grid-shell {
         grid-template-columns: 1fr;
     }
@@ -2012,14 +2146,11 @@ body[data-theme="dark"] .action-btn.integration {
         min-width: 0;
     }
 
-    /* Mobile archive pattern: swipeable preview cards instead of a long dense stack. */
     .anime-grid {
-        display: flex;
-        gap: 0.8rem;
-        overflow-x: auto;
-        padding: 0.15rem 0.1rem 0.7rem;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
+        display: grid;
+        gap: 0.75rem;
+        overflow: visible;
+        padding: 0;
     }
 
     .anime-grid .state-note {
@@ -2027,10 +2158,9 @@ body[data-theme="dark"] .action-btn.integration {
     }
 
     .anime-card {
-        min-width: min(86vw, 360px);
+        min-width: 0;
         display: grid;
         grid-template-columns: 100px 1fr;
-        scroll-snap-align: start;
         border-radius: 16px;
     }
 
@@ -2059,12 +2189,10 @@ body[data-theme="dark"] .action-btn.integration {
     }
 
     .knowledge-grid {
-        display: flex;
+        display: grid;
         gap: 0.75rem;
-        overflow-x: auto;
-        padding: 0.1rem 0.1rem 0.72rem;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
+        overflow: visible;
+        padding: 0;
     }
 
     .knowledge-grid .state-note {
@@ -2072,9 +2200,8 @@ body[data-theme="dark"] .action-btn.integration {
     }
 
     .knowledge-card {
-        min-width: min(90vw, 360px);
+        min-width: 0;
         grid-template-columns: 92px 1fr;
-        scroll-snap-align: start;
         border-radius: 16px;
     }
 
@@ -2091,20 +2218,6 @@ body[data-theme="dark"] .action-btn.integration {
     .knowledge-detail,
     .knowledge-related {
         font-size: 0.8rem;
-    }
-
-    .knowledge-grid::-webkit-scrollbar {
-        height: 8px;
-    }
-
-    .knowledge-grid::-webkit-scrollbar-thumb {
-        background: rgba(109, 68, 35, 0.35);
-        border-radius: 999px;
-    }
-
-    .knowledge-grid::-webkit-scrollbar-track {
-        background: rgba(109, 68, 35, 0.1);
-        border-radius: 999px;
     }
 
     .mobile-toggle-panel {
@@ -2144,28 +2257,11 @@ body[data-theme="dark"] .action-btn.integration {
         display: none;
     }
 
-    .anime-grid::-webkit-scrollbar {
-        height: 8px;
-    }
-
-    .anime-grid::-webkit-scrollbar-thumb {
-        background: rgba(109, 68, 35, 0.35);
-        border-radius: 999px;
-    }
-
-    .anime-grid::-webkit-scrollbar-track {
-        background: rgba(109, 68, 35, 0.1);
-        border-radius: 999px;
-    }
-
-    /* Mobile timeline mirrors the archive preview pattern with swipeable cards. */
     .timeline-track {
-        display: flex;
-        gap: 0.75rem;
-        overflow-x: auto;
-        padding: 0.1rem 0.1rem 0.72rem;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
+        display: grid;
+        gap: 0.55rem;
+        overflow: visible;
+        padding: 0;
     }
 
     .timeline-track::before {
@@ -2174,7 +2270,7 @@ body[data-theme="dark"] .action-btn.integration {
 
     .timeline-node {
         position: relative;
-        min-width: min(84vw, 330px);
+        min-width: 0;
         margin-left: 0;
         padding: 0.72rem 0.78rem 0.76rem;
         border-radius: 16px;
@@ -2186,7 +2282,6 @@ body[data-theme="dark"] .action-btn.integration {
                 transparent 42%
             ),
             var(--surface-raised);
-        scroll-snap-align: start;
         box-shadow: 0 8px 16px rgba(26, 20, 16, 0.1);
     }
 
@@ -2225,20 +2320,6 @@ body[data-theme="dark"] .action-btn.integration {
         margin-top: 0.28rem;
         font-size: 0.82rem;
         line-height: 1.36;
-    }
-
-    .timeline-track::-webkit-scrollbar {
-        height: 8px;
-    }
-
-    .timeline-track::-webkit-scrollbar-thumb {
-        background: rgba(109, 68, 35, 0.35);
-        border-radius: 999px;
-    }
-
-    .timeline-track::-webkit-scrollbar-track {
-        background: rgba(109, 68, 35, 0.1);
-        border-radius: 999px;
     }
 
     .search-row {
@@ -2316,14 +2397,8 @@ body[data-theme="dark"] .action-btn.integration {
         gap: 0.45rem;
     }
 
-    .theme-dock {
-        right: 0.5rem;
-    }
-
     .api-health-widget {
-        right: 0.5rem;
-        top: max(4.35rem, calc(env(safe-area-inset-top) + 3.8rem));
-        width: min(236px, calc(100vw - 1rem));
+        width: auto;
         padding: 0.62rem 0.68rem;
         border-radius: 12px;
     }
@@ -2358,9 +2433,11 @@ body[data-theme="dark"] .action-btn.integration {
     }
 
     .page-shell {
-        width: 95vw;
+        width: 100%;
+        max-width: 100%;
         margin-top: -1.9rem;
         margin-bottom: 2rem;
+        padding-inline: 0.6rem;
     }
 
     .panel {
@@ -2368,7 +2445,7 @@ body[data-theme="dark"] .action-btn.integration {
     }
 
     .anime-card {
-        min-width: 90vw;
+        min-width: 0;
         grid-template-columns: 90px 1fr;
     }
 
@@ -2385,7 +2462,7 @@ body[data-theme="dark"] .action-btn.integration {
     }
 
     .timeline-node {
-        min-width: 90vw;
+        min-width: 0;
         padding: 0.64rem 0.68rem 0.7rem;
     }
 
@@ -2408,6 +2485,7 @@ body[data-theme="dark"] .action-btn.integration {
     input,
     select,
     textarea {
+        min-height: 44px;
         padding: 0.55rem 0.65rem;
     }
 

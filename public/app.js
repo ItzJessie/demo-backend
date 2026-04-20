@@ -915,6 +915,19 @@ function initializeSectionNavigation() {
                 block: "start",
             });
             window.history.replaceState(null, "", `#${headingId}`);
+
+            if (window.matchMedia(MOBILE_SECTION_QUERY).matches) {
+                const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
+                const docsNav = document.querySelector(".docs-nav");
+                const docsNavContent = document.getElementById("docsNavContent");
+
+                if (sidebarToggleBtn && docsNav && docsNavContent) {
+                    docsNav.classList.add("is-collapsed");
+                    sidebarToggleBtn.setAttribute("aria-expanded", "false");
+                    docsNavContent.setAttribute("aria-hidden", "true");
+                    localStorage.setItem("animePortalSidebarCollapsed", "true");
+                }
+            }
         });
 
         li.appendChild(link);
@@ -1022,23 +1035,57 @@ function initializeSidebarToggle() {
     }
 
     const SIDEBAR_STORAGE_KEY = "animePortalSidebarCollapsed";
-    const isCollapsed = localStorage.getItem(SIDEBAR_STORAGE_KEY) === "true";
+    const savedCollapseState = localStorage.getItem(SIDEBAR_STORAGE_KEY);
+    const mediaQuery = window.matchMedia(MOBILE_SECTION_QUERY);
 
-    if (isCollapsed) {
-        docsNav.classList.add("is-collapsed");
-        sidebarToggleBtn.setAttribute("aria-expanded", "false");
-    } else {
-        docsNav.classList.remove("is-collapsed");
-        sidebarToggleBtn.setAttribute("aria-expanded", "true");
-    }
+    const setSidebarState = (isCollapsed) => {
+        docsNav.classList.toggle("is-collapsed", isCollapsed);
+        sidebarToggleBtn.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
+        docsNavContent.setAttribute("aria-hidden", isCollapsed ? "true" : "false");
+    };
+
+    const resolveInitialState = () => {
+        if (!mediaQuery.matches) {
+            return false;
+        }
+
+        if (savedCollapseState === "true" || savedCollapseState === "false") {
+            return savedCollapseState === "true";
+        }
+
+        return mediaQuery.matches;
+    };
+
+    setSidebarState(resolveInitialState());
 
     sidebarToggleBtn.addEventListener("click", () => {
-        const isCurrentlyCollapsed = docsNav.classList.toggle("is-collapsed");
-        const newAriaExpanded = isCurrentlyCollapsed ? "false" : "true";
-        
-        sidebarToggleBtn.setAttribute("aria-expanded", newAriaExpanded);
+        const isCurrentlyCollapsed = !docsNav.classList.contains("is-collapsed");
+        setSidebarState(isCurrentlyCollapsed);
         localStorage.setItem(SIDEBAR_STORAGE_KEY, String(isCurrentlyCollapsed));
     });
+
+    const handleViewportChange = (event) => {
+        const currentSavedState = localStorage.getItem(SIDEBAR_STORAGE_KEY);
+
+        if (!event.matches) {
+            // Desktop/tablet layout should always keep TOC visible.
+            setSidebarState(false);
+            return;
+        }
+
+        if (currentSavedState === "true" || currentSavedState === "false") {
+            setSidebarState(currentSavedState === "true");
+            return;
+        }
+
+        setSidebarState(true);
+    };
+
+    if (typeof mediaQuery.addEventListener === "function") {
+        mediaQuery.addEventListener("change", handleViewportChange);
+    } else if (typeof mediaQuery.addListener === "function") {
+        mediaQuery.addListener(handleViewportChange);
+    }
 }
 
 function getCurrentTheme() {
