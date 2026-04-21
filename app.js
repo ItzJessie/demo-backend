@@ -9,6 +9,15 @@ const multer = require("multer");
 
 require("dotenv").config();
 
+const {
+  createAnime,
+  deleteAnime,
+  getAllAnime,
+  getAnimeById,
+  getAnimeStoreStatus,
+  updateAnime,
+} = require("./services/animeStore");
+
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
 const FEEDBACK_DIR = path.join(__dirname, "feedbacks");
@@ -55,7 +64,24 @@ fsSync.mkdirSync(UPLOADS_DIR, { recursive: true });
 
 let mongoClient;
 let mongoCollection;
-let animeListCache = null;
+
+function normalizeFeedbackRecord(record) {
+  if (!record || typeof record !== "object") {
+    return null;
+  }
+
+  const normalized = {
+    ...record,
+  };
+
+  if (normalized._id !== undefined) {
+    delete normalized._id;
+  }
+
+  normalized.id = String(normalized.id || Date.now());
+  normalized.submittedAt = String(normalized.submittedAt || new Date().toISOString());
+  return normalized;
+}
 
 const uploadStorage = multer.diskStorage({
   destination: (_req, _file, cb) => {
@@ -199,23 +225,67 @@ async function getLocalFeedback() {
   }
 }
 
-async function loadAnimeList() {
-  const raw = await fs.readFile(ANIME_FILE, "utf8");
-  const parsed = JSON.parse(raw);
-
-  if (!Array.isArray(parsed)) {
-    throw new Error("Anime data file is not an array");
+async function getMongoFeedback() {
+  const collection = await ensureMongoCollection();
+  if (!collection) {
+    return [];
   }
 
-  return parsed;
+  const records = await collection
+    .find({}, { projection: { _id: 0 } })
+    .sort({ submittedAt: -1 })
+    .toArray();
+
+  return records.map((record) => normalizeFeedbackRecord(record)).filter(Boolean);
 }
 
-async function getAnimeList() {
-  if (!animeListCache) {
-    animeListCache = await loadAnimeList();
+function mergeFeedbackRecords(localFeedback, mongoFeedback) {
+  const merged = new Map();
+
+  for (const record of [...localFeedback, ...mongoFeedback]) {
+    const normalized = normalizeFeedbackRecord(record);
+    if (!normalized) {
+      continue;
+    }
+
+    const existing = merged.get(normalized.id);
+    if (!existing) {
+      merged.set(normalized.id, normalized);
+      continue;
+    }
+
+    if (String(normalized.submittedAt) > String(existing.submittedAt)) {
+      merged.set(normalized.id, normalized);
+    }
   }
 
-  return animeListCache;
+  return [...merged.values()].sort((a, b) => String(b.submittedAt).localeCompare(String(a.submittedAt)));
+}
+
+async function getFeedbackRecords() {
+  const localFeedback = await getLocalFeedback();
+
+  try {
+    const mongoFeedback = await getMongoFeedback();
+    if (mongoFeedback.length === 0) {
+      return localFeedback;
+    }
+
+    return mergeFeedbackRecords(localFeedback, mongoFeedback);
+  } catch (err) {
+    console.error("Error reading feedback from MongoDB", err);
+    return localFeedback;
+  }
+}
+
+async function closeMongoFeedbackConnection() {
+  if (!mongoClient) {
+    return;
+  }
+
+  await mongoClient.close();
+  mongoClient = null;
+  mongoCollection = null;
 }
 
 async function loadStudiosCreators() {
@@ -280,12 +350,31 @@ app.use(express.static(path.join(__dirname, "public")));
 
 async function handleAnimeRequest(_req, res) {
   try {
-    const animeList = await getAnimeList();
+    const animeList = await getAllAnime();
     res.json(animeList);
   } catch (err) {
     console.error("Error loading anime data", err);
     res.status(500).json({ error: "Failed to load anime records" });
   }
+}
+
+function handleAnimeWithImageUpload(handler) {
+  return (req, res) => {
+    uploadImage.single("image")(req, res, async (err) => {
+      if (err instanceof multer.MulterError) {
+        return res.status(400).json({
+          success: false,
+          error: err.code === "LIMIT_FILE_SIZE" ? "Image must be 5MB or less" : err.message,
+        });
+      }
+
+      if (err) {
+        return res.status(400).json({ success: false, error: err.message });
+      }
+
+      return handler(req, res);
+    });
+  };
 }
 
 app.get("/api/anime", async (_req, res) => {
@@ -397,9 +486,7 @@ app.get("/api/routes", (_req, res) => {
 
 app.get("/api/anime/:id", async (req, res) => {
   try {
-    const animeList = await getAnimeList();
-    const id = Number(req.params.id);
-    const anime = animeList.find((item) => item._id === id);
+    const anime = await getAnimeById(req.params.id);
 
     if (!anime) {
       return res.status(404).json({ error: "Anime not found" });
@@ -413,7 +500,15 @@ app.get("/api/anime/:id", async (req, res) => {
 });
 
 async function handleAnimeCreate(req, res) {
-  const { error, value } = animeCreateSchema.validate(req.body || {}, {
+  const payload = {
+    ...(req.body || {}),
+  };
+
+  if (req.file) {
+    payload.img_name = `images/uploads/${req.file.filename}`;
+  }
+
+  const { error, value } = animeCreateSchema.validate(payload, {
     abortEarly: false,
     stripUnknown: true,
   });
@@ -427,48 +522,7 @@ async function handleAnimeCreate(req, res) {
   }
 
   try {
-    const animeList = await getAnimeList();
-    if (!Array.isArray(animeList)) {
-      return res.status(500).json({
-        success: false,
-        error: "Anime dataset is not available",
-      });
-    }
-
-    const resolvedSlug = value.slug || `${toSlug(value.title)}-${value.year}`;
-    const resolvedEra = value.era || getEraLabel(value.year);
-
-    const duplicate = animeList.some((item) => {
-      if (!item || typeof item !== "object") {
-        return false;
-      }
-      const slugMatch = String(item.slug || "").toLowerCase() === resolvedSlug.toLowerCase();
-      const titleYearMatch =
-        String(item.title || "").toLowerCase() === String(value.title).toLowerCase() &&
-        Number(item.year) === Number(value.year);
-      return slugMatch || titleYearMatch;
-    });
-
-    if (duplicate) {
-      return res.status(409).json({
-        success: false,
-        error: "Anime record already exists",
-      });
-    }
-
-    const nextId = animeList.reduce((maxId, item) => {
-      const currentId = item && typeof item === "object" ? Number(item._id) || 0 : 0;
-      return currentId > maxId ? currentId : maxId;
-    }, 0) + 1;
-
-    const newAnime = {
-      _id: nextId,
-      ...value,
-      era: resolvedEra,
-      slug: resolvedSlug,
-    };
-
-    animeList.push(newAnime);
+    const newAnime = await createAnime(value);
 
     return res.status(201).json({
       success: true,
@@ -476,6 +530,13 @@ async function handleAnimeCreate(req, res) {
       data: newAnime,
     });
   } catch (err) {
+    if (err && err.code === "ANIME_DUPLICATE") {
+      return res.status(409).json({
+        success: false,
+        error: "Anime record already exists",
+      });
+    }
+
     console.error("Error adding anime", err);
     return res.status(500).json({
       success: false,
@@ -484,111 +545,74 @@ async function handleAnimeCreate(req, res) {
   }
 }
 
-app.post("/api/anime", handleAnimeCreate);
-app.post("/add", handleAnimeCreate);
-app.post("/post", handleAnimeCreate);
-app.post("/create", handleAnimeCreate);
-app.post("/new", handleAnimeCreate);
+app.post("/api/anime", handleAnimeWithImageUpload(handleAnimeCreate));
+app.post("/add", handleAnimeWithImageUpload(handleAnimeCreate));
+app.post("/post", handleAnimeWithImageUpload(handleAnimeCreate));
+app.post("/create", handleAnimeWithImageUpload(handleAnimeCreate));
+app.post("/new", handleAnimeWithImageUpload(handleAnimeCreate));
 
-app.put("/api/anime/:id", (req, res) => {
-  uploadImage.single("image")(req, res, async (err) => {
-    if (err instanceof multer.MulterError) {
-      return res.status(400).json({
-        success: false,
-        error: err.code === "LIMIT_FILE_SIZE" ? "Image must be 5MB or less" : err.message,
-      });
-    }
-
-    if (err) {
-      return res.status(400).json({ success: false, error: err.message });
-    }
-
-    const id = Number(req.params.id);
-    if (!Number.isInteger(id) || id <= 0) {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid anime id",
-      });
-    }
-
-    const payload = {
-      ...(req.body || {}),
-    };
-
-    if (req.file) {
-      payload.img_name = `images/uploads/${req.file.filename}`;
-    }
-
-    const { error, value } = animeCreateSchema.validate(payload, {
-      abortEarly: false,
-      stripUnknown: true,
+async function handleAnimeUpdate(req, res) {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({
+      success: false,
+      error: "Invalid anime id",
     });
+  }
 
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        error: "Validation failed",
-        details: error.details.map((item) => item.message),
-      });
-    }
+  const payload = {
+    ...(req.body || {}),
+  };
 
-    try {
-      const animeList = await getAnimeList();
-      const animeIndex = animeList.findIndex((item) => Number(item._id) === id);
+  if (req.file) {
+    payload.img_name = `images/uploads/${req.file.filename}`;
+  }
 
-      if (animeIndex === -1) {
-        return res.status(404).json({
-          success: false,
-          error: "Anime not found",
-        });
-      }
-
-      const resolvedSlug = value.slug || `${toSlug(value.title)}-${value.year}`;
-      const resolvedEra = value.era || getEraLabel(value.year);
-
-      const duplicate = animeList.some((item, index) => {
-        if (index === animeIndex || !item || typeof item !== "object") {
-          return false;
-        }
-        const slugMatch = String(item.slug || "").toLowerCase() === resolvedSlug.toLowerCase();
-        const titleYearMatch =
-          String(item.title || "").toLowerCase() === String(value.title).toLowerCase() &&
-          Number(item.year) === Number(value.year);
-        return slugMatch || titleYearMatch;
-      });
-
-      if (duplicate) {
-        return res.status(409).json({
-          success: false,
-          error: "Anime record already exists",
-        });
-      }
-
-      const existingAnime = animeList[animeIndex];
-      const updatedAnime = {
-        ...existingAnime,
-        ...value,
-        era: resolvedEra,
-        slug: resolvedSlug,
-        _id: existingAnime._id,
-      };
-
-      animeList[animeIndex] = updatedAnime;
-
-      return res.status(200).json({
-        success: true,
-        message: "Anime updated successfully",
-        data: updatedAnime,
-      });
-    } catch (updateErr) {
-      console.error("Error updating anime", updateErr);
-      return res.status(500).json({
-        success: false,
-        error: "Failed to update anime record",
-      });
-    }
+  const { error, value } = animeCreateSchema.validate(payload, {
+    abortEarly: false,
+    stripUnknown: true,
   });
-});
+
+  if (error) {
+    return res.status(400).json({
+      success: false,
+      error: "Validation failed",
+      details: error.details.map((item) => item.message),
+    });
+  }
+
+  try {
+    const updatedAnime = await updateAnime(id, value);
+
+    if (!updatedAnime) {
+      return res.status(404).json({
+        success: false,
+        error: "Anime not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Anime updated successfully",
+      data: updatedAnime,
+    });
+  } catch (updateErr) {
+    if (updateErr && updateErr.code === "ANIME_DUPLICATE") {
+      return res.status(409).json({
+        success: false,
+        error: "Anime record already exists",
+      });
+    }
+
+    console.error("Error updating anime", updateErr);
+    return res.status(500).json({
+      success: false,
+      error: "Failed to update anime record",
+    });
+  }
+}
+
+app.put("/api/anime/:id", handleAnimeWithImageUpload(handleAnimeUpdate));
 
 app.delete("/api/anime/:id", async (req, res) => {
   const id = Number(req.params.id);
@@ -600,18 +624,14 @@ app.delete("/api/anime/:id", async (req, res) => {
   }
 
   try {
-    const animeList = await getAnimeList();
-    const animeIndex = animeList.findIndex((item) => Number(item._id) === id);
+    const deletedAnime = await deleteAnime(id);
 
-    if (animeIndex === -1) {
+    if (!deletedAnime) {
       return res.status(404).json({
         success: false,
         error: "Anime not found",
       });
     }
-
-    const deletedAnime = animeList[animeIndex];
-    animeList.splice(animeIndex, 1);
 
     return res.json({
       success: true,
@@ -734,7 +754,7 @@ app.post("/api/feedback", async (req, res) => {
 
 app.get("/api/feedback", async (_req, res) => {
   try {
-    const feedback = await getLocalFeedback();
+    const feedback = await getFeedbackRecords();
     res.json(feedback);
   } catch (err) {
     console.error("Error reading feedback", err);
@@ -742,12 +762,25 @@ app.get("/api/feedback", async (_req, res) => {
   }
 });
 
-app.get("/api/health", (_req, res) => {
-  res.json({
-    status: "ok",
-    mongodbConfigured: Boolean(MONGODB_URI),
-    atlasTarget: MONGODB_URI ? `${MONGODB_DB}.${MONGODB_COLLECTION}` : null,
-  });
+app.get("/api/health", async (_req, res) => {
+  try {
+    const animeStoreStatus = await getAnimeStoreStatus();
+    res.json({
+      status: "ok",
+      mongodbConfigured: Boolean(MONGODB_URI),
+      atlasTarget: MONGODB_URI ? `${MONGODB_DB}.${MONGODB_COLLECTION}` : null,
+      animeStore: animeStoreStatus.mode,
+      animeMongoConnected: animeStoreStatus.connected,
+    });
+  } catch (_error) {
+    res.json({
+      status: "ok",
+      mongodbConfigured: Boolean(MONGODB_URI),
+      atlasTarget: MONGODB_URI ? `${MONGODB_DB}.${MONGODB_COLLECTION}` : null,
+      animeStore: "local",
+      animeMongoConnected: false,
+    });
+  }
 });
 
 let hasSignalHandler = false;
@@ -758,9 +791,12 @@ function registerSignalHandler() {
   }
 
   process.on("SIGINT", async () => {
-    if (mongoClient) {
-      await mongoClient.close();
-    }
+    await closeMongoFeedbackConnection();
+    process.exit(0);
+  });
+
+  process.on("SIGTERM", async () => {
+    await closeMongoFeedbackConnection();
     process.exit(0);
   });
 
@@ -774,6 +810,10 @@ function startServer(port = PORT) {
     if (!MONGODB_URI) {
       console.log("MONGODB_URI not set. Feedback will still save locally under /feedbacks.");
     }
+  });
+
+  server.on("close", () => {
+    void closeMongoFeedbackConnection();
   });
 
   return server;

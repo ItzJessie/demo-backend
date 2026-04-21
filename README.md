@@ -1,6 +1,6 @@
 # Japanese Animation History Archive Backend API
 
-Express-based backend for the Anime Archive project. It serves the anime dataset, studio and creator metadata, feedback storage, image uploads, and a route catalog used by the tests and frontend.
+Express-based backend for the Japanese Animation History Archive project. It serves the anime dataset, studio and creator metadata, feedback storage, image uploads, and a route catalog used by the tests and frontend.
 
 ## Overview
 
@@ -8,7 +8,8 @@ The app starts from `index.js` and `server.js`, both of which load the shared se
 
 Important runtime note:
 
-- Anime create/update/delete changes are applied in memory for the current process and are **not** persisted back to `data/animeSeries.json`.
+- Anime create/update/delete operations use MongoDB collection `anime` when `MONGODB_URI` is configured and connected. If MongoDB is unavailable, the API falls back to in-memory data seeded from `data/animeSeries.json` for the current process.
+- Local fallback mode never writes changes back to `data/animeSeries.json`.
 - Feedback submissions are persisted to local JSON files under `feedbacks/`.
 
 ## Requirements
@@ -51,7 +52,8 @@ Notes:
 
 - `FRONTEND_ORIGIN` and `FRONTEND_ORIGINS` extend the CORS allowlist.
 - In non-production mode, localhost, private-network, and `.local` origins are also allowed for cross-device testing.
-- If `MONGODB_URI` is set, feedback is also inserted into the configured MongoDB collection.
+- If `MONGODB_URI` is set, feedback is also inserted into the configured MongoDB collection from `MONGODB_COLLECTION`.
+- Anime records use MongoDB database `MONGODB_DB`, collection `anime` when connected.
 - If `STUDIOS_CREATORS_FILE` is set, the studios/creators endpoint reads from that file instead of `data/studiosCreators.json`.
 
 ## API
@@ -62,7 +64,7 @@ Notes:
 GET /api/health
 ```
 
-Returns server status and whether MongoDB is configured.
+Returns server status and storage mode metadata, including whether feedback MongoDB is configured and whether the anime store is currently connected to MongoDB.
 
 ### Route catalog
 
@@ -79,7 +81,10 @@ GET /api/anime
 GET /get
 ```
 
-Returns the full anime list from `data/animeSeries.json`.
+Returns the full anime list from the active store:
+
+- MongoDB `anime` collection when connected
+- In-memory fallback seeded from `data/animeSeries.json` when MongoDB is unavailable
 
 ```http
 GET /api/anime/:id
@@ -125,6 +130,7 @@ Behavior:
 - `era` is auto-derived from `year` when omitted.
 - `slug` is auto-generated from `title` and `year` when omitted.
 - Duplicate title/year or duplicate slug records are rejected.
+- `POST` create endpoints accept either regular JSON or multipart form data with an `image` file field.
 - `PUT /api/anime/:id` accepts regular JSON or multipart form data with an `image` file field.
 - Uploaded images are stored under `public/images/uploads` and returned as `images/uploads/<filename>`.
 
@@ -175,14 +181,19 @@ GET /api/feedback
 
 Feedback requires `name`, `email`, and `satisfaction`. The server stores each submission locally in `feedbacks/feedback_<timestamp>.json` and, if MongoDB is configured, also inserts it into the configured Atlas collection.
 
+`GET /api/feedback` returns a merged, de-duplicated list from local storage and MongoDB (when configured), sorted by newest `submittedAt` first.
+
 Example response:
 
 ```json
 {
+  "success": true,
   "message": "Feedback submitted successfully",
   "id": "1774967773042",
+  "savedToLocal": true,
   "insertedToMongo": false,
-  "atlasLocation": null
+  "atlasLocation": null,
+  "warnings": []
 }
 ```
 
@@ -265,7 +276,7 @@ demo-backend/
 - The server enables CORS for the local frontend and the deployed GitHub Pages origin.
 - Static assets are served from `public/`.
 - Feedback remains available locally even when MongoDB is not configured.
-- Anime record edits are process-local and reset when the server restarts.
+- Anime record edits persist in MongoDB when connected; otherwise they are process-local fallback changes that reset on server restart.
 - The API returns JSON errors for validation failures, missing anime records, and storage issues.
 
 ## Support
