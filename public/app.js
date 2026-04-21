@@ -8,6 +8,8 @@ const MOBILE_SECTION_STORAGE_KEY = "animePortalMobileSection";
 const CHECKLIST_STORAGE_KEY = "animePortalChecklist";
 const MOBILE_SECTION_QUERY = "(max-width: 719px)";
 const DESKTOP_COLLAPSE_QUERY = "(min-width: 1100px)";
+const DESKTOP_NAV_SCROLL_QUERY = "(min-width: 1025px)";
+const DESKTOP_NAV_MAX_OFFSET = 56;
 const FALLBACK_IMAGE_PATH = "images/fallback.jpg";
 const posterPreviewObjectUrls = { add: "", edit: "" };
 const JSON_BODY_METHODS = ["POST", "PUT", "PATCH"];
@@ -125,6 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function initializePortal() {
     initializeTheme();
     initializeSidebarToggle();
+    initializeDesktopNavScrollOffset();
     initializeDeterminationDashboard();
     initializeApiHealthWidget();
     initializeSectionNavigation();
@@ -1086,6 +1089,45 @@ function initializeSidebarToggle() {
     } else if (typeof mediaQuery.addListener === "function") {
         mediaQuery.addListener(handleViewportChange);
     }
+}
+
+function initializeDesktopNavScrollOffset() {
+    const nav = document.querySelector(".docs-nav");
+    if (!nav || !window.matchMedia || !window.matchMedia(DESKTOP_NAV_SCROLL_QUERY).matches) {
+        return;
+    }
+
+    const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+        nav.style.removeProperty("--docs-nav-scroll-offset");
+        return;
+    }
+
+    let rafId = 0;
+
+    const updateNavOffset = () => {
+        rafId = 0;
+        const offset = Math.min(
+            DESKTOP_NAV_MAX_OFFSET,
+            Math.round(window.scrollY * 0.05)
+        );
+        nav.style.setProperty("--docs-nav-scroll-offset", `${offset}px`);
+    };
+
+    const requestOffsetUpdate = () => {
+        if (rafId) {
+            return;
+        }
+
+        rafId = window.requestAnimationFrame(updateNavOffset);
+    };
+
+    updateNavOffset();
+    window.addEventListener("scroll", requestOffsetUpdate, { passive: true });
+    window.addEventListener("resize", requestOffsetUpdate, { passive: true });
 }
 
 function getCurrentTheme() {
